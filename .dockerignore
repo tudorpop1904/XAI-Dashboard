@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+.ruff_cache/
+*.pyc
+.git/
+.gitignore
+data_cache/
+models/
+*.egg-info/
+.env
+.kaggle/
+.vscode/
+*.txt
+!requirements.txt
+*.md
+*/__pycache__/
+*.png

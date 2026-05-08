@@ -1,0 +1,58 @@
+services:
+
+  # ---- Streamlit dashboard ----
+  xai-app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: xai-app
+    env_file:
+      - ../.env
+    ports:
+      - "8501:8501"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_MODEL=llama3.1:8b
+      - VLM_MODEL=qwen2.5vl:7b
+      - VLM_HOST=http://ollama:11434
+      - XAI_SURROGATE_MODEL=minicpm-v
+      # Set REMOTE_VLM_HOST to offload VLM to external hardware (e.g. Pi)
+      # - REMOTE_VLM_HOST=http://<external-ip>:11434
+      - KAGGLE_USERNAME=${KAGGLE_USERNAME}
+      - KAGGLE_API_TOKEN=${KAGGLE_API_TOKEN}
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  # ---- Local LLM server ----
+  ollama:
+    image: ollama/ollama:latest
+    container_name: xai-ollama
+    entrypoint: [ "/bin/bash", "/entrypoint.sh" ]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+      - ../entrypoint.sh:/entrypoint.sh
+    restart: unless-stopped
+    environment:
+      # Keep only 1 model loaded and limit concurrency to save RAM
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_NUM_PARALLEL=1
+    deploy:
+      resources:
+        limits:
+          memory: 10G
+        reservations:
+          memory: 10G
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+
+volumes:
+  ollama_data:
