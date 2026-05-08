@@ -1,5 +1,0 @@
-FAIL samithababu/career-recommendation-for-engineering-students | KaggleApiHTTPError
-FAIL iabhimanyugupta/skill-and-career-recommendation-system | KaggleApiHTTPError
-FAIL adityaramachandran27/world-career-prediction-dataset | KaggleApiHTTPError
-FAIL mohamedabdelaziz1510/career-prediction-dataset | KaggleApiHTTPError
-FAIL missionjee/predict-students-learning-ability-2024 | KaggleApiHTTPError

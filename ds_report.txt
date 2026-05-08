@@ -1,3 +1,0 @@
-OK ckshetty/candidate-job-role-dataset | candidate_job_role_dataset.csv | (1000, 5) | targets: ['job_role']
-OK ahsanneural/tech-layoffs-and-hiring-trends-2025-2026 | layoffs_industry_analysis.csv | (27, 5) | targets: []
-OK hmnshudhmn24/ai-resume-matcher-dataset-2000-samples | large_resume_dataset.csv | (2000, 5) | targets: ['Applied_Job_Role']

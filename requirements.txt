@@ -13,3 +13,5 @@ python-dotenv>=1.0.0
 # PyTorch: Docker installs a CPU wheel in docker/Dockerfile. For local runs:
 #   pip install torch --index-url https://download.pytorch.org/whl/cpu
 Pillow>=10.0.0
+streamlit-drawable-canvas>=0.9.3
+torchvision>=0.26.0
