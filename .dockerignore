@@ -1,6 +1,8 @@
 .venv/
 __pycache__/
+*/__pycache__/
 .ruff_cache/
+.pytest_cache/
 *.pyc
 .git/
 .gitignore
@@ -10,8 +12,11 @@ models/
 .env
 .kaggle/
 .vscode/
-*.txt
-!requirements.txt
 *.md
-*/__pycache__/
 *.png
+*.jpg
+*.jpeg
+tests/
+docs/
+Jenkinsfile
+requirements-dev.txt

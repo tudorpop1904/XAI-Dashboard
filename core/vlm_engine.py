@@ -26,6 +26,8 @@ from typing import Generator, List, Optional, Tuple
 import ollama
 from PIL import Image
 
+from core.cache import cached_chat
+
 
 # ─────────────────────────────────────────────
 # Configuration
@@ -45,7 +47,7 @@ XAI_SURROGATE_MODEL: str = os.environ.get("XAI_SURROGATE_MODEL", "minicpm-v")
 VLM_HOST: str = os.environ.get("VLM_HOST", os.environ.get("OLLAMA_HOST", "http://localhost:11434"))
 
 # The text-only LLM used for reasoning / evaluation after transcription.
-EVAL_MODEL: str = os.environ.get("OLLAMA_MODEL", "llama3.1:8b")
+EVAL_MODEL: str = os.environ.get("OLLAMA_MODEL", "llama3.1:8b-instruct-q4_K_M")
 
 # Remote compute backend (future: Raspberry Pi, etc.).
 # When set, VLM inference requests are forwarded to this host instead of
@@ -272,21 +274,20 @@ def transcribe_images(images: List[Image.Image]) -> TranscriptionResult:
     client = _get_vlm_client()
     image_bytes = _prepare_images(images)
 
+    messages = [
+        {
+            "role": "system",
+            "content": _TRANSCRIPTION_SYSTEM,
+        },
+        {
+            "role": "user",
+            "content": _TRANSCRIPTION_USER,
+            "images": image_bytes,
+        },
+    ]
+
     t0 = time.time()
-    response = client.chat(
-        model=VLM_MODEL,
-        messages=[
-            {
-                "role": "system",
-                "content": _TRANSCRIPTION_SYSTEM,
-            },
-            {
-                "role": "user",
-                "content": _TRANSCRIPTION_USER,
-                "images": image_bytes,
-            },
-        ],
-    )
+    response = cached_chat(client, VLM_MODEL, messages)
     elapsed = time.time() - t0
 
     raw = response["message"]["content"]

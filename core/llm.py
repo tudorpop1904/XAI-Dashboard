@@ -9,7 +9,7 @@ import os
 import ollama
 
 
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1:8b")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1:8b-instruct-q4_K_M")
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 
 _client = ollama.Client(host=OLLAMA_HOST)

@@ -1,3 +1,4 @@
+# ---- Production dependencies ----
 streamlit>=1.55.0
 pandas>=2.3.0
 numpy>=2.4.0
@@ -10,8 +11,9 @@ ollama>=0.6.0
 dice-ml>=0.11
 kagglehub>=1.0.0
 python-dotenv>=1.0.0
-# PyTorch: Docker installs a CPU wheel in docker/Dockerfile. For local runs:
-#   pip install torch --index-url https://download.pytorch.org/whl/cpu
 Pillow>=10.0.0
 streamlit-drawable-canvas>=0.9.3
-torchvision>=0.26.0
+# TTS: uses browser-native Web Speech API (zero server deps — no pip package needed)
+# PyTorch + torchvision: installed together from the CPU index in docker/Dockerfile.
+#   For local runs:
+#     pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu

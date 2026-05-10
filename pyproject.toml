@@ -1,0 +1,25 @@
+[project]
+name = "xai-dashboard"
+version = "2.0.0"
+description = "Explainable AI Counselor Dashboard — Career guidance, math tutoring, and accessible writing instruction powered by XAI."
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP"]
+ignore = ["E501"]  # line length handled by formatter
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: tests that require Ollama or Docker (deselect with -m 'not integration')",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

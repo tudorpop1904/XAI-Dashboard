@@ -82,6 +82,24 @@ _DEFAULTS = {
     "cf_immutable": None,
     "cf_results": None,
     "cf_llm_feedback": None,
+
+    # --- Accessible Writing Instructor ---
+    "acc_model_state": None,
+    "acc_label_map": None,
+    "acc_num_classes": None,
+    "acc_val_accuracy": None,
+    "acc_train_history": None,
+    "acc_device": "cpu",
+    "acc_attempts": 0,
+    "acc_correct": 0,
+    "acc_last_x": None,
+    "acc_last_pred_class": None,
+    "acc_last_char": None,
+    "acc_last_conf": None,
+    "acc_last_top3": None,
+    "acc_grad_cam": None,
+    "acc_saliency": None,
+    "acc_exercises": None,
 }
 
 
@@ -146,6 +164,13 @@ def reset_counterfactual_flow():
     """Clear counterfactual (DiCE) pipeline."""
     for k, v in _DEFAULTS.items():
         if k.startswith("cf_"):
+            st.session_state[k] = v
+
+
+def reset_accessible_flow():
+    """Clear accessible writing instructor pipeline."""
+    for k, v in _DEFAULTS.items():
+        if k.startswith("acc_"):
             st.session_state[k] = v
 
 

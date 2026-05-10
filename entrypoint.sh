@@ -31,14 +31,14 @@ echo "Ollama server is ready! (took ${WAITED}s)"
 
 # Pull models (skips download if already present)
 echo ""
-echo "Pulling LLM model (llama3.1:8b)..."
-ollama pull llama3.1:8b
-echo "✓ llama3.1:8b ready"
+echo "Pulling LLM model (llama3.1:8b-instruct-q4_K_M)..."
+ollama pull llama3.1:8b-instruct-q4_K_M
+echo "✓ llama3.1:8b-instruct-q4_K_M ready"
 
 echo ""
-echo "Pulling VLM model (qwen2.5vl:7b)..."
-ollama pull qwen2.5vl:7b
-echo "✓ qwen2.5vl:7b ready"
+echo "Pulling VLM model (qwen2.5vl:7b-q4_K_M)..."
+ollama pull qwen2.5vl:7b-q4_K_M
+echo "✓ qwen2.5vl:7b-q4_K_M ready"
 
 echo ""
 echo "Pulling XAI surrogate model (minicpm-v)..."

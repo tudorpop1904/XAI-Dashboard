@@ -11,6 +11,7 @@ from ui.state import (
     reset_visualization_flow,
     reset_advanced_tutor_flow,
     reset_counterfactual_flow,
+    reset_accessible_flow,
 )
 
 init_state()
@@ -99,6 +100,31 @@ with col4:
             st.session_state["xai_category"] = "counterfactual"
             st.switch_page("pages/cf_1_input.py")
 
+# ---- Row 3: Accessible Writing ----
+col5, col6 = st.columns(2)
+
+with col5:
+    st.markdown("### ✍️ Accessible Writing Instructor")
+    st.caption("EMNIST · Drawing canvas · TTS · Grad-CAM/Saliency")
+    st.write(
+        "A writing tutor for **visually impaired children**. "
+        "Draw characters on a canvas, get real-time recognition with "
+        "**text-to-speech** feedback, and see **Grad-CAM/Saliency** maps "
+        "showing which strokes the AI focused on."
+    )
+    if st.button("Start Writing Instructor", type="primary", use_container_width=True):
+        reset_feature_attribution_flow()
+        reset_visualization_flow()
+        reset_advanced_tutor_flow()
+        reset_counterfactual_flow()
+        reset_accessible_flow()
+        st.session_state["xai_category"] = "accessible_writing"
+        st.switch_page("pages/acc_1_setup.py")
+
+with col6:
+    st.markdown("### 🔧 More coming soon…")
+    st.info("Additional XAI methods and tasks are planned.")
+
 st.divider()
 
 # ---- Quick-start info ----
@@ -106,15 +132,14 @@ st.divider()
 with st.expander("ℹ️  How does this app work?"):
     st.markdown(
         """
-        1. **Select an XAI category** above — all four are now live.
-        2. **Pick a dataset** from Kaggle's career-guidance collections (FA/CF), or upload photos (Viz / Tutor).
+        1. **Select an XAI category** above — all five are now live.
+        2. **Pick a dataset** from Kaggle (FA/CF), upload photos (Viz/Tutor), or draw on a canvas (Writing Instructor).
         3. **Choose and train** a machine-learning predictor, or let the VLM handle it.
-        4. **Enter your own data** and get a prediction or transcription.
+        4. **Enter your own data** and get a prediction, transcription, or character recognition.
         5. **Explain** the prediction with SHAP/LIME, Grad-CAM/saliency, occlusion sensitivity, or DiCE counterfactuals.
-        6. **Interpret** the results with an LLM-powered "Guidance Counselor".
+        6. **Interpret** the results with an LLM-powered "Guidance Counselor" or writing tutor.
 
         Each step lives on its own page — use the sidebar or the
         **Back** / **Home** buttons to navigate.
         """
     )
-

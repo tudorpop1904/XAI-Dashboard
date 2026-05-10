@@ -75,6 +75,10 @@ pg = st.navigation(
         st.Page("pages/cf_1_input.py", title="CF · Input", icon="🔄"),
         st.Page("pages/cf_2_explain.py", title="CF · Explain", icon="🎲"),
         st.Page("pages/cf_3_counselor.py", title="CF · Counselor", icon="🗣️"),
+        st.Page("pages/acc_1_setup.py", title="Write · Setup", icon="✍️"),
+        st.Page("pages/acc_2_practice.py", title="Write · Practice", icon="✏️"),
+        st.Page("pages/acc_3_xai.py", title="Write · XAI", icon="🌡️"),
+        st.Page("pages/acc_4_tutor.py", title="Write · Tutor", icon="📝"),
     ]
 )
 

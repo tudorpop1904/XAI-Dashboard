@@ -16,7 +16,7 @@ This guide describes how to manage memory and resource allocation for the XAI Pl
 | `tinyllama` | ~637 MB | ~1.5 GB | Basic — fast, but lower-quality explanations |
 | `phi3:mini` | ~2.3 GB | ~3.5 GB | **Default** — good balance of quality and speed |
 | `phi3` | ~3.8 GB | ~5 GB | Better quality, higher RAM |
-| `llama3.1:8b` | ~4.7 GB | ~6.5 GB | High quality, needs 8+ GB free RAM |
+| `llama3.1:8b-instruct-q4_K_M` | ~4.7 GB | ~6.5 GB | High quality, needs 8+ GB free RAM |
 
 ## 🐳 Docker Compose Memory Limits
 
@@ -36,7 +36,7 @@ Docker Desktop on Windows runs inside a WSL2 virtual machine. By default, WSL2 c
 1. **Create/edit** `%UserProfile%\.wslconfig`:
    ```ini
    [wsl2]
-   memory=8GB      # For phi3:mini. Use 12GB+ for llama3.1:8b.
+   memory=8GB      # For phi3:mini. Use 12GB+ for llama3.1:8b-instruct-q4_K_M.
    swap=2GB
    processors=4
    ```

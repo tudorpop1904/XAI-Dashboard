@@ -1,0 +1,14 @@
+FROM jenkins/jenkins:lts
+
+USER root
+
+# Install Python 3 and Docker CLI for running tests and building images
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    python3-venv \
+    docker.io \
+    && rm -rf /var/lib/apt/lists/*
+
+USER jenkins

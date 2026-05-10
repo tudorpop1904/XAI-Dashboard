@@ -77,11 +77,11 @@ streamlit run app.py
    ```
 3. **Pull the LLM model** (first time only):
    ```bash
-   docker exec -it xai-ollama ollama pull llama3.1:8b
+   docker exec -it xai-ollama ollama pull llama3.1:8b-instruct-q4_K_M
    ```
 4. **Pull the VLM model** (first time only):
    ```bash
-   docker exec -it xai-ollama ollama pull qwen2.5-vl:7b
+   docker exec -it xai-ollama ollama pull qwen2.5vl:7b-q4_K_M
    ```
 5. **Pull the VLM Surrogate model** (first time only):
    ```bash
@@ -93,8 +93,8 @@ streamlit run app.py
 
 | Model | RAM needed |
 |-------|-----------|
-| `llama3.1:8b` | ~6.5 GB |
-| `qwen2.5-vl:7b` | ~10 GB |
+| `llama3.1:8b-instruct-q4_K_M` | ~6.5 GB |
+| `qwen2.5vl:7b-q4_K_M` | ~10 GB |
 | `minicpm-v` | ~4 GB |
 
 
