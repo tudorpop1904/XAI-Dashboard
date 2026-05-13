@@ -4,6 +4,8 @@ __pycache__/
 */__pycache__/
 .vscode/
 .kaggle/
+data_cache/
+*/data_cache/
 .venv/
 .env
 *.png

@@ -18,3 +18,5 @@ tests/
 docs/
 Jenkinsfile
 requirements-dev.txt
+data_cache/
+*/data_cache/
