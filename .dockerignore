@@ -6,8 +6,6 @@ __pycache__/
 *.pyc
 .git/
 .gitignore
-data_cache/
-models/
 *.egg-info/
 .env
 .kaggle/
