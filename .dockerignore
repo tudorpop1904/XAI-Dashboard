@@ -3,9 +3,14 @@ __pycache__/
 */__pycache__/
 .ruff_cache/
 .pytest_cache/
+.vscode/
+.kaggle/
+.coverage
+.gitattributes
 *.pyc
 .git/
 .gitignore
+models/
 *.egg-info/
 .env
 .kaggle/
@@ -18,5 +23,4 @@ tests/
 docs/
 Jenkinsfile
 requirements-dev.txt
-data_cache/
-*/data_cache/
+demo/
