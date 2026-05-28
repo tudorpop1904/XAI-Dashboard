@@ -53,7 +53,15 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -f docker/Dockerfile -t xai-app:${BUILD_NUMBER} .'
+                sh 'docker build -f docker/Dockerfile -t xai-app:${BUILD_NUMBER} -t xai-app:latest .'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying application stack to the local Docker daemon...'
+                // Start/recreate all services in detached mode
+                sh 'docker compose -f docker/docker-compose.yml up -d'
             }
         }
     }
