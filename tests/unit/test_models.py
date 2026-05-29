@@ -1,12 +1,10 @@
 """Tests for core.models module."""
 
 import pytest
-import numpy as np
 from core.models import (
     MODEL_REGISTRY,
     get_model_names,
     get_available_models,
-    get_shap_explainer_type,
     train_model,
 )
 

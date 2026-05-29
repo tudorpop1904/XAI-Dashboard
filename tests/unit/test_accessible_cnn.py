@@ -2,11 +2,9 @@
 
 import numpy as np
 import torch
-import pytest
 
 from core.accessible_cnn import (
     build_emnist_label_map,
-    NUM_CLASSES,
     AccessibleCNN,
     canvas_to_tensor,
     pil_to_emnist_tensor,

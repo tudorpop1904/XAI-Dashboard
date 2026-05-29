@@ -4,7 +4,6 @@ viz_3_predict.py — Upload a handwritten expression photo and get read-out + an
 
 import io
 
-import numpy as np
 import streamlit as st
 import torch
 from PIL import Image

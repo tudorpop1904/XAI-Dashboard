@@ -6,7 +6,6 @@ All page logic lives in the pages/ directory; this file is only
 responsible for routing and shared setup.
 """
 
-import os
 from dotenv import load_dotenv
 
 # Load .env for local (non-Docker) runs — sets KAGGLE_USERNAME, KAGGLE_KEY, etc.

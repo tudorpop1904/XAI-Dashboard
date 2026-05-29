@@ -7,9 +7,7 @@ The CNN recognizes it and speaks the result aloud via TTS.
 
 import io
 
-import numpy as np
 import streamlit as st
-import torch
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 

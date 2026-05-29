@@ -5,7 +5,6 @@ Shows the child (or their instructor) WHERE the AI looked when
 recognizing the character — reuses the white-box XAI methods.
 """
 
-import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 import torch

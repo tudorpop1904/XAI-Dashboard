@@ -1,10 +1,5 @@
 """Tests for core.dice_engine module."""
 
-import pytest
-import pandas as pd
-import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-
 from core.dice_engine import generate_counterfactuals, CF_METHODS
 
 

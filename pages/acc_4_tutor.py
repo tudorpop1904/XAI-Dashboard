@@ -8,7 +8,7 @@ progress and recognized characters. Results are read aloud via TTS.
 import streamlit as st
 
 from ui.state import init_state, require, nav_buttons
-from ui.accessibility import inject_accessible_theme, accessible_metric, show_result
+from ui.accessibility import inject_accessible_theme, accessible_metric
 from core.llm import stream_llm_explanation, check_ollama_available
 from core.tts import speak_exercise
 

@@ -1,10 +1,7 @@
 """Tests for core.cache module."""
 
-import json
-import pytest
-import pathlib
 
-from core.cache import _make_key, get_cached, put_cached, clear_cache, CACHE_DIR
+from core.cache import _make_key, get_cached, put_cached, clear_cache
 
 
 class TestMakeKey:

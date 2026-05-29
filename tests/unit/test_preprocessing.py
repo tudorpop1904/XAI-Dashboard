@@ -2,7 +2,6 @@
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from core.preprocessing import preprocess_data, encode_input, detect_task
 

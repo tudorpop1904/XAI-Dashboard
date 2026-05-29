@@ -8,7 +8,7 @@ trains the model, and shows the accuracy / R² score.
 import streamlit as st
 from ui.state import init_state, require, nav_buttons, reset_prediction_state
 from core.preprocessing import preprocess_data, detect_task
-from core.models import get_model_names, get_available_models, train_model
+from core.models import get_available_models, train_model
 
 init_state()
 

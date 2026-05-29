@@ -1,20 +1,15 @@
 """Tests for core.viz_math_cnn module (CNN architecture, training, XAI)."""
 
-import numpy as np
 import torch
-import pytest
 
 from core.viz_math_cnn import (
     generate_synthetic_bundle,
     HandwritingCNN,
     train_model,
-    predict_class,
-    pil_to_tensor_gray,
     grad_cam_for_image,
     input_saliency,
     model_state_bytes,
     load_model_from_bytes,
-    class_to_solution,
 )
 
 
