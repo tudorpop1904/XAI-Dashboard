@@ -32,6 +32,8 @@ pipeline {
             steps {
                 sh '''
                     . ${VENV}/bin/activate
+                    ruff check --select I --fix
+                    ruff format
                     ruff check . --output-format=github
                 '''
             }
