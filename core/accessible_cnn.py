@@ -203,6 +203,89 @@ class AccessibleCNN(nn.Module):
         return logits, conv_out
 
 
+class AccessibleCNNLight(nn.Module):
+    """
+    Sleek 2-layer CNN for single-character recognition (62 classes).
+    Trains incredibly fast, making it ideal for quick demos.
+    """
+
+    def __init__(self, num_classes: int = NUM_CLASSES):
+        super().__init__()
+        self.block = nn.Sequential(
+            nn.Conv2d(1, 16, kernel_size=3, padding=1),
+            nn.BatchNorm2d(16),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),  # 28→14
+            nn.Conv2d(16, 32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2),  # 14→7
+        )
+        self.gap = nn.AdaptiveAvgPool2d((4, 4))
+        self.dropout = nn.Dropout(0.2)
+        self.fc = nn.Linear(32 * 4 * 4, num_classes)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        logits, _ = self.forward_with_conv(x)
+        return logits
+
+    def forward_with_conv(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        conv_out = self.block(x)
+        pooled = self.gap(conv_out)
+        flat = self.dropout(pooled.flatten(1))
+        logits = self.fc(flat)
+        return logits, conv_out
+
+
+class AccessibleCNNDeep(nn.Module):
+    """
+    4-layer deep CNN with residual-like skip connections for single-character recognition (62 classes).
+    Highly accurate but slower to train.
+    """
+
+    def __init__(self, num_classes: int = NUM_CLASSES):
+        super().__init__()
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(32)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm2d(64)
+
+        # Residual-like layers
+        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, padding=1)
+        self.bn3 = nn.BatchNorm2d(64)
+        self.conv4 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.bn4 = nn.BatchNorm2d(128)
+
+        self.gap = nn.AdaptiveAvgPool2d((4, 4))
+        self.dropout = nn.Dropout(0.4)
+        self.fc = nn.Linear(128 * 4 * 4, num_classes)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        logits, _ = self.forward_with_conv(x)
+        return logits
+
+    def forward_with_conv(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        # Layer 1
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = F.max_pool2d(out, 2)  # 28→14
+
+        # Layer 2
+        out = F.relu(self.bn2(self.conv2(out)))
+        out = F.max_pool2d(out, 2)  # 14→7
+
+        # Layer 3 & 4 (with residual/skip logic)
+        res = out
+        out = F.relu(self.bn3(self.conv3(out)))
+        out = out + res  # Skip connection
+
+        conv_out = F.relu(self.bn4(self.conv4(out)))
+
+        pooled = self.gap(conv_out)
+        flat = self.dropout(pooled.flatten(1))
+        logits = self.fc(flat)
+        return logits, conv_out
+
+
 # ─────────────────────────────────────────────
 # Training
 # ─────────────────────────────────────────────
