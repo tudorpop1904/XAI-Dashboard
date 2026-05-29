@@ -40,11 +40,7 @@ def infer_schema(df):
             schema["empty_columns"].append(col)
             continue
 
-        if (
-            col.lower() in ["index", "key"]
-            or col.lower().endswith("_id")
-            or col.lower().startswith("id")
-        ):
+        if col.lower() in ["index", "key"] or col.lower().endswith("_id") or col.lower().startswith("id"):
             schema["id_like_columns"].append(col)
             continue
 

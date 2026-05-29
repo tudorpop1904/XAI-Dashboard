@@ -6,11 +6,12 @@ displays an overview (shape, dropped columns, preview table).
 """
 
 import streamlit as st
-from ui.state import init_state, require, nav_buttons, reset_training_state
+
+from data.cleaner import clean_dataset
 from data.datasets import DATASETS
 from data.loader import download_dataset, load_csv_from_dataset
-from data.cleaner import clean_dataset
 from ui.schema import infer_schema
+from ui.state import init_state, nav_buttons, require, reset_training_state
 
 init_state()
 

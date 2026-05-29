@@ -42,6 +42,7 @@ def _reveal_only_region(
     revealed.paste(region, (x0, y0))
     return revealed
 
+
 def _apply_mask(
     img: Image.Image,
     mask: np.ndarray,
@@ -55,6 +56,7 @@ def _apply_mask(
     cell_h = h // grid_rows
     masked = img.copy()
     from PIL import ImageDraw as _IDraw
+
     draw = _IDraw.Draw(masked)
     for r in range(grid_rows):
         for c in range(grid_cols):
@@ -65,6 +67,7 @@ def _apply_mask(
                 y1 = y0 + cell_h if r < grid_rows - 1 else h
                 draw.rectangle([x0, y0, x1, y1], fill=fill)
     return masked
+
 
 def vlm_pmi_sensitivity(
     images: list[Image.Image],
@@ -134,6 +137,7 @@ def vlm_pmi_sensitivity(
     # Upscale to image dimensions
     w, h = img0.size
     from PIL import Image as _PILImage
+
     heatmap_pil = _PILImage.fromarray((importance * 255).astype(np.uint8), mode="L")
     heatmap_pil = heatmap_pil.resize((w, h), _PILImage.BILINEAR)
     heatmap = np.asarray(heatmap_pil, dtype=np.float32) / 255.0
@@ -144,10 +148,11 @@ def vlm_pmi_sensitivity(
         grid_cols=grid_cols,
         baseline_text=surrogate_baseline,
         cell_texts=cell_texts,
-        cell_similarities=pmi_scores, # store raw pmi scores here
+        cell_similarities=pmi_scores,  # store raw pmi scores here
         surrogate_model=probe_model,
         elapsed_seconds=elapsed,
     )
+
 
 def vlm_sobol_sensitivity(
     images: list[Image.Image],
@@ -231,6 +236,7 @@ def vlm_sobol_sensitivity(
     # Upscale to image dimensions
     w, h = img0.size
     from PIL import Image as _PILImage
+
     heatmap_pil = _PILImage.fromarray((sobol_grid * 255).astype(np.uint8), mode="L")
     heatmap_pil = heatmap_pil.resize((w, h), _PILImage.BILINEAR)
     heatmap = np.asarray(heatmap_pil, dtype=np.float32) / 255.0
@@ -240,7 +246,7 @@ def vlm_sobol_sensitivity(
         grid_rows=grid_rows,
         grid_cols=grid_cols,
         baseline_text=surrogate_baseline,
-        cell_texts=[f"Sample {i}: sim={s:.2f}" for i, s in enumerate(similarities[:10])], # summary
+        cell_texts=[f"Sample {i}: sim={s:.2f}" for i, s in enumerate(similarities[:10])],  # summary
         cell_similarities=similarities,
         surrogate_model=probe_model,
         elapsed_seconds=elapsed,

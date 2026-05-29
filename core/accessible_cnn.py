@@ -11,14 +11,12 @@ from __future__ import annotations
 import io
 import random
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from PIL import Image
-
 
 # ─────────────────────────────────────────────
 # EMNIST class mapping
@@ -27,7 +25,8 @@ from PIL import Image
 # EMNIST ByClass has 62 classes: 0-9 (indices 0–9), A-Z (10–35), a-z (36–61)
 # The label mapping follows ASCII order after transformation.
 
-def build_emnist_label_map() -> Dict[int, str]:
+
+def build_emnist_label_map() -> dict[int, str]:
     """Build mapping from EMNIST ByClass label index → character string."""
     mapping = {}
     for i in range(10):
@@ -47,14 +46,16 @@ NUM_CLASSES = len(EMNIST_LABEL_MAP)  # 62
 # Data Loading
 # ─────────────────────────────────────────────
 
+
 @dataclass
 class EMNISTBundle:
     """Training and validation data for the accessible CNN."""
-    train_images: torch.Tensor   # (N, 1, 28, 28) float 0–1
-    train_labels: torch.Tensor   # (N,) long
+
+    train_images: torch.Tensor  # (N, 1, 28, 28) float 0–1
+    train_labels: torch.Tensor  # (N,) long
     val_images: torch.Tensor
     val_labels: torch.Tensor
-    label_map: Dict[int, str]
+    label_map: dict[int, str]
     num_classes: int
 
 
@@ -71,9 +72,11 @@ def load_emnist_bundle(
     """
     from torchvision import datasets, transforms
 
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-    ])
+    transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+        ]
+    )
 
     # Download EMNIST ByClass (auto-cached in ./data_cache/)
     train_dataset = datasets.EMNIST(
@@ -96,9 +99,9 @@ def load_emnist_bundle(
         rng = random.Random(seed)
 
         # Use the raw underlying tensors for speed instead of per-item __getitem__
-        if hasattr(dataset, 'data') and hasattr(dataset, 'targets'):
-            raw_data = dataset.data       # (N, 28, 28) uint8
-            raw_labels = dataset.targets   # (N,) int
+        if hasattr(dataset, "data") and hasattr(dataset, "targets"):
+            raw_data = dataset.data  # (N, 28, 28) uint8
+            raw_labels = dataset.targets  # (N,) int
             if not isinstance(raw_labels, torch.Tensor):
                 raw_labels = torch.tensor(raw_labels, dtype=torch.long)
 
@@ -111,16 +114,16 @@ def load_emnist_bundle(
             rng.shuffle(selected_indices)
             idx_tensor = torch.tensor(selected_indices, dtype=torch.long)
 
-            imgs = raw_data[idx_tensor].float() / 255.0       # (N, 28, 28)
+            imgs = raw_data[idx_tensor].float() / 255.0  # (N, 28, 28)
             # EMNIST images are stored transposed (X and Y swapped)
             imgs = imgs.transpose(1, 2)
-            imgs = imgs.unsqueeze(1)                           # (N, 1, 28, 28)
+            imgs = imgs.unsqueeze(1)  # (N, 1, 28, 28)
             lbls = raw_labels[idx_tensor]
 
             return imgs, lbls
 
         # Fallback: per-item access (slow but always works)
-        buckets: Dict[int, List[int]] = {}
+        buckets: dict[int, list[int]] = {}
         for idx in range(len(dataset)):
             _, label = dataset[idx]
             label = int(label)
@@ -162,6 +165,7 @@ def load_emnist_bundle(
 # CNN Architecture
 # ─────────────────────────────────────────────
 
+
 class AccessibleCNN(nn.Module):
     """
     Small CNN for single-character recognition (62 classes).
@@ -174,11 +178,11 @@ class AccessibleCNN(nn.Module):
             nn.Conv2d(1, 32, kernel_size=3, padding=1),
             nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2),                                # 28→14
+            nn.MaxPool2d(2),  # 28→14
             nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2),                                # 14→7
+            nn.MaxPool2d(2),  # 14→7
             nn.Conv2d(64, 128, kernel_size=3, padding=1),
             nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
@@ -191,7 +195,7 @@ class AccessibleCNN(nn.Module):
         logits, _ = self.forward_with_conv(x)
         return logits
 
-    def forward_with_conv(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward_with_conv(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         conv_out = self.block(x)
         pooled = self.gap(conv_out)
         flat = self.dropout(pooled.flatten(1))
@@ -203,6 +207,7 @@ class AccessibleCNN(nn.Module):
 # Training
 # ─────────────────────────────────────────────
 
+
 def train_accessible_model(
     bundle: EMNISTBundle,
     epochs: int = 8,
@@ -211,7 +216,7 @@ def train_accessible_model(
     device: str | torch.device = "cpu",
     seed: int = 42,
     progress_callback=None,
-) -> Tuple[AccessibleCNN, float, dict]:
+) -> tuple[AccessibleCNN, float, dict]:
     """
     Train the AccessibleCNN on EMNIST.
 
@@ -265,6 +270,7 @@ def train_accessible_model(
 # Canvas preprocessing
 # ─────────────────────────────────────────────
 
+
 def _crop_to_content(gray: np.ndarray, padding: int = 20) -> np.ndarray:
     """
     Crop a grayscale image to the bounding box of non-zero content,
@@ -284,7 +290,7 @@ def _crop_to_content(gray: np.ndarray, padding: int = 20) -> np.ndarray:
     cmin, cmax = np.where(cols)[0][[0, -1]]
 
     # Crop
-    cropped = gray[rmin:rmax + 1, cmin:cmax + 1]
+    cropped = gray[rmin : rmax + 1, cmin : cmax + 1]
 
     # Make square (pad shorter dimension)
     h, w = cropped.shape
@@ -292,7 +298,7 @@ def _crop_to_content(gray: np.ndarray, padding: int = 20) -> np.ndarray:
     square = np.zeros((size, size), dtype=np.float32)
     y_off = (size - h) // 2
     x_off = (size - w) // 2
-    square[y_off:y_off + h, x_off:x_off + w] = cropped
+    square[y_off : y_off + h, x_off : x_off + w] = cropped
 
     return square
 
@@ -351,10 +357,10 @@ def pil_to_emnist_tensor(img: Image.Image) -> torch.Tensor:
 def predict_character(
     model: AccessibleCNN,
     x: torch.Tensor,
-    label_map: Dict[int, str],
+    label_map: dict[int, str],
     device: str | torch.device = "cpu",
     top_k: int = 3,
-) -> List[Tuple[str, float]]:
+) -> list[tuple[str, float]]:
     """
     Predict character from tensor input.
 
@@ -378,11 +384,12 @@ def predict_character(
 # Grad-CAM + Saliency (reuse patterns from viz_math_cnn)
 # ─────────────────────────────────────────────
 
+
 def grad_cam_accessible(
     model: AccessibleCNN,
     x: torch.Tensor,
     target_class: int,
-    img_hw: Tuple[int, int] = (28, 28),
+    img_hw: tuple[int, int] = (28, 28),
     device: str | torch.device = "cpu",
 ) -> np.ndarray:
     """Grad-CAM for AccessibleCNN. Returns heatmap in [0,1]."""
@@ -440,6 +447,7 @@ def saliency_accessible(
 # ─────────────────────────────────────────────
 # Model serialization
 # ─────────────────────────────────────────────
+
 
 def model_state_bytes(model: nn.Module) -> bytes:
     buf = io.BytesIO()

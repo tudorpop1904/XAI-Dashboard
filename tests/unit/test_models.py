@@ -1,10 +1,11 @@
 """Tests for core.models module."""
 
 import pytest
+
 from core.models import (
     MODEL_REGISTRY,
-    get_model_names,
     get_available_models,
+    get_model_names,
     train_model,
 )
 
@@ -46,6 +47,7 @@ class TestGetAvailableModels:
 class TestTrainModel:
     def test_train_random_forest(self, sample_career_df):
         from core.preprocessing import preprocess_data
+
         X, y, _, task = preprocess_data(sample_career_df, "career")
         model, score = train_model(X, y, task, "Random Forest")
         assert model is not None
@@ -53,6 +55,7 @@ class TestTrainModel:
 
     def test_train_decision_tree(self, sample_career_df):
         from core.preprocessing import preprocess_data
+
         X, y, _, task = preprocess_data(sample_career_df, "career")
         model, score = train_model(X, y, task, "Decision Tree")
         assert model is not None
@@ -60,6 +63,7 @@ class TestTrainModel:
 
     def test_unknown_model_raises(self, sample_career_df):
         from core.preprocessing import preprocess_data
+
         X, y, _, task = preprocess_data(sample_career_df, "career")
         with pytest.raises(ValueError):
             train_model(X, y, task, "NonExistentModel")

@@ -11,7 +11,7 @@ import io
 import streamlit as st
 from PIL import Image
 
-from ui.state import init_state, require, nav_buttons
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -54,8 +54,10 @@ if uploads:
 
     # Clear downstream state when new images are uploaded
     for key in (
-        "adv_transcription", "adv_transcription_raw",
-        "adv_evaluation", "adv_evaluation_raw",
+        "adv_transcription",
+        "adv_transcription_raw",
+        "adv_evaluation",
+        "adv_evaluation_raw",
         "adv_llm_feedback",
     ):
         st.session_state[key] = None
@@ -95,7 +97,7 @@ elif st.session_state.get("adv_images"):
             idx = row_start + i
             if idx < len(images):
                 with col:
-                    name = names[idx] if idx < len(names) else f"Page {idx+1}"
+                    name = names[idx] if idx < len(names) else f"Page {idx + 1}"
                     st.image(images[idx], caption=name, use_container_width=True)
 
     st.divider()

@@ -7,7 +7,6 @@ tailored for severe blurriness and tunnel vision.
 
 import streamlit as st
 
-
 # ─────────────────────────────────────────────
 # High-contrast theme (injected via CSS)
 # ─────────────────────────────────────────────
@@ -109,6 +108,6 @@ def accessible_metric(label: str, value: str):
         f'background:#1e293b; border-radius:12px; margin:0.5rem 0;">'
         f'<div style="font-size:1rem; color:#94a3b8;">{label}</div>'
         f'<div style="font-size:2.4rem; font-weight:700; color:#f8fafc;">{value}</div>'
-        f'</div>',
+        f"</div>",
         unsafe_allow_html=True,
     )

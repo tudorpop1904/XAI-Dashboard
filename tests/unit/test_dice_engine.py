@@ -1,6 +1,6 @@
 """Tests for core.dice_engine module."""
 
-from core.dice_engine import generate_counterfactuals, CF_METHODS
+from core.dice_engine import CF_METHODS, generate_counterfactuals
 
 
 class TestCFMethods:
@@ -25,6 +25,7 @@ class TestGenerateCounterfactuals:
 
         # Encode input
         from core.preprocessing import encode_input
+
         encoded_input = encode_input(sample_input_row, encoders)
 
         continuous = [c for c in X.columns if c != "career"]
@@ -50,6 +51,7 @@ class TestGenerateCounterfactuals:
         training_df["career"] = y
 
         from core.preprocessing import encode_input
+
         encoded_input = encode_input(sample_input_row, encoders)
         continuous = [c for c in X.columns if c != "career"]
 

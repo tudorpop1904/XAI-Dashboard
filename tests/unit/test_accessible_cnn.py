@@ -2,19 +2,19 @@
 
 import numpy as np
 import torch
+from PIL import Image
 
 from core.accessible_cnn import (
-    build_emnist_label_map,
     AccessibleCNN,
+    build_emnist_label_map,
     canvas_to_tensor,
+    grad_cam_accessible,
+    load_model_from_bytes,
+    model_state_bytes,
     pil_to_emnist_tensor,
     predict_character,
-    grad_cam_accessible,
     saliency_accessible,
-    model_state_bytes,
-    load_model_from_bytes,
 )
-from PIL import Image
 
 
 class TestLabelMap:

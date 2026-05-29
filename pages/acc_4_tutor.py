@@ -7,10 +7,10 @@ progress and recognized characters. Results are read aloud via TTS.
 
 import streamlit as st
 
-from ui.state import init_state, require, nav_buttons
-from ui.accessibility import inject_accessible_theme, accessible_metric
-from core.llm import stream_llm_explanation, check_ollama_available
+from core.llm import check_ollama_available, stream_llm_explanation
 from core.tts import speak_exercise
+from ui.accessibility import accessible_metric, inject_accessible_theme
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -49,7 +49,6 @@ def _build_tutor_prompt() -> str:
         "You are a patient, encouraging writing tutor helping a visually impaired "
         "child learn to write letters and numbers by hand. The child practices by "
         "drawing characters on a digital canvas, which an AI recognizes.\n\n",
-
         "## Rules for your response\n",
         "- Use SIMPLE, CLEAR language (age 7-12)\n",
         "- Be VERY encouraging and supportive\n",
@@ -57,7 +56,6 @@ def _build_tutor_prompt() -> str:
         "- Generate 3-5 practice exercises (single characters or short words)\n",
         "- Each exercise should be a clear instruction like 'Write the letter B'\n",
         "- Consider the child's visual impairment — suggest writing BIG and BOLD\n\n",
-
         "## Current session data\n",
     ]
 
@@ -81,8 +79,7 @@ def _build_tutor_prompt() -> str:
             )
         elif rate < 0.7:
             parts.append(
-                "\nThe child is progressing well. Introduce slightly harder characters "
-                "and encourage consistency.\n"
+                "\nThe child is progressing well. Introduce slightly harder characters and encourage consistency.\n"
             )
         else:
             parts.append(
@@ -123,7 +120,7 @@ with c1:
 with c2:
     accessible_metric("Correct", str(correct))
 with c3:
-    rate = f"{correct/attempts:.0%}" if attempts > 0 else "—"
+    rate = f"{correct / attempts:.0%}" if attempts > 0 else "—"
     accessible_metric("Accuracy", rate)
 
 st.divider()

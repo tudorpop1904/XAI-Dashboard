@@ -11,20 +11,20 @@ import streamlit as st
 from PIL import Image
 from streamlit_drawable_canvas import st_canvas
 
-from ui.state import init_state, require, nav_buttons
-from ui.accessibility import (
-    inject_accessible_theme,
-    show_big_character,
-    show_result,
-    accessible_metric,
-)
 from core.accessible_cnn import (
-    load_model_from_bytes,
     canvas_to_tensor,
+    load_model_from_bytes,
     pil_to_emnist_tensor,
     predict_character,
 )
 from core.tts import speak, speak_character_result
+from ui.accessibility import (
+    accessible_metric,
+    inject_accessible_theme,
+    show_big_character,
+    show_result,
+)
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -157,7 +157,7 @@ if st.session_state.get("acc_last_char") is not None:
     with c2:
         accessible_metric("Correct", str(correct))
     with c3:
-        rate = f"{correct/attempts:.0%}" if attempts > 0 else "—"
+        rate = f"{correct / attempts:.0%}" if attempts > 0 else "—"
         accessible_metric("Accuracy", rate)
 
     # Navigation

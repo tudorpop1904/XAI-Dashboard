@@ -47,7 +47,7 @@ if st.session_state.get("trained_models") is not None and len(st.session_state["
         "Choose which model to explain:",
         list(st.session_state["trained_models"].keys()),
         index=list(st.session_state["trained_models"].keys()).index(st.session_state["model_name"]),
-        key="explain_model_select"
+        key="explain_model_select",
     )
     # Update active model in session state
     st.session_state["model"] = st.session_state["trained_models"][active_model_name]["model"]
@@ -76,7 +76,7 @@ with c2:
         step=1,
         key="num_runs_input",
         help="SHAP is deterministic for the same model/input. "
-             "LIME uses random perturbations so results vary between runs.",
+        "LIME uses random perturbations so results vary between runs.",
     )
 
 if not use_shap and not use_lime and not use_pmi and not use_sobol:
@@ -86,7 +86,6 @@ if not use_shap and not use_lime and not use_pmi and not use_sobol:
 # ---- Run button ----
 
 if st.button("Run Explanations", type="primary"):
-
     model = st.session_state["model"]
     model_name = st.session_state["model_name"]
     X = st.session_state["X"]
@@ -105,7 +104,6 @@ if st.button("Run Explanations", type="primary"):
         methods_used.append("Sobol")
 
     with st.spinner(f"Running {', '.join(methods_used)} for {num_runs} run(s)…"):
-
         # Build explainers once
         shap_explainer = None
         lime_explainer = None
@@ -128,20 +126,14 @@ if st.button("Run Explanations", type="primary"):
 
             if use_shap and shap_explainer is not None:
                 shap_values = compute_shap_values(shap_explainer, encoded_input_df)
-                run_data["shap_df"] = shap_values_to_dataframe(
-                    shap_values, encoded_input_df, predicted_class_idx
-                )
-                run_data["shap_base_value"] = get_base_value(
-                    shap_explainer, predicted_class_idx
-                )
+                run_data["shap_df"] = shap_values_to_dataframe(shap_values, encoded_input_df, predicted_class_idx)
+                run_data["shap_base_value"] = get_base_value(shap_explainer, predicted_class_idx)
             else:
                 run_data["shap_df"] = None
                 run_data["shap_base_value"] = None
 
             if use_lime and lime_explainer is not None:
-                run_data["lime_df"] = explain_with_lime(
-                    lime_explainer, model, encoded_input_df, task_type
-                )
+                run_data["lime_df"] = explain_with_lime(lime_explainer, model, encoded_input_df, task_type)
             else:
                 run_data["lime_df"] = None
 

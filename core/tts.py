@@ -41,7 +41,7 @@ def speak(
             utterance.pitch = {pitch};
             utterance.lang = '{lang}';
 
-            {'window.speechSynthesis.speak(utterance);' if auto_play else ''}
+            {"window.speechSynthesis.speak(utterance);" if auto_play else ""}
         }}
     }})();
     </script>

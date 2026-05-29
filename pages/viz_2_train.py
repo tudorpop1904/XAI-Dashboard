@@ -4,12 +4,13 @@ viz_2_train.py — Train the handwriting CNN on the prepared synthetic bundle.
 
 import streamlit as st
 import torch
-from ui.state import init_state, require, nav_buttons
+
 from core.viz_math_cnn import (
     VizMathBundle,
-    train_model,
     model_state_bytes,
+    train_model,
 )
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 

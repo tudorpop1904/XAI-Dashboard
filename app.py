@@ -6,15 +6,15 @@ All page logic lives in the pages/ directory; this file is only
 responsible for routing and shared setup.
 """
 
+import streamlit as st
 from dotenv import load_dotenv
+
+from core.llm import check_ollama_available
+from core.vlm_engine import check_surrogate_available, check_vlm_available
+from ui.state import init_state
 
 # Load .env for local (non-Docker) runs — sets KAGGLE_USERNAME, KAGGLE_KEY, etc.
 load_dotenv()
-
-import streamlit as st
-from ui.state import init_state
-from core.llm import check_ollama_available
-from core.vlm_engine import check_vlm_available, check_surrogate_available
 
 # ---- Page-level config (must be first Streamlit call) ----
 st.set_page_config(
@@ -29,6 +29,7 @@ init_state()
 # ---- Background model polling ----
 if "models_pulled" not in st.session_state:
     st.session_state["models_pulled"] = False
+
 
 @st.fragment(run_every="5s")
 def poll_ollama_models():
@@ -47,6 +48,7 @@ def poll_ollama_models():
             st.rerun()
     except Exception:
         pass
+
 
 if not st.session_state["models_pulled"]:
     with st.sidebar:

@@ -9,12 +9,12 @@ Prerequisite: the FA pipeline must have been run first (dataset loaded,
 model trained) — we reuse the same model and encoders.
 """
 
-import streamlit as st
 import pandas as pd
+import streamlit as st
 
-from ui.state import init_state, require, nav_buttons
-from ui.forms import generate_input_form
 from core.preprocessing import encode_input
+from ui.forms import generate_input_form
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -66,8 +66,7 @@ else:
 desired_career = st.selectbox(
     "Which career do you want the AI to recommend?",
     career_options,
-    help="DiCE will find what minimal changes to your profile would "
-         "make the model predict this career.",
+    help="DiCE will find what minimal changes to your profile would make the model predict this career.",
 )
 
 # ---- Feature constraints ----
@@ -103,17 +102,14 @@ st.info(f"📌 **Current prediction for your profile:** {current_pred}")
 
 if str(current_pred) == str(desired_career):
     st.success(
-        "✅ The model already predicts your desired career! "
-        "You can still generate CFs to see alternative paths."
+        "✅ The model already predicts your desired career! You can still generate CFs to see alternative paths."
     )
 
 # ---- Save & proceed ----
 if st.button("Generate Counterfactuals →", type="primary"):
     # Encode the desired class for DiCE
     if target_column in encoders:
-        desired_encoded = int(
-            encoders[target_column].transform([desired_career])[0]
-        )
+        desired_encoded = int(encoders[target_column].transform([desired_career])[0])
     else:
         desired_encoded = desired_career
 

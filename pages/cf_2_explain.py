@@ -5,15 +5,15 @@ Runs DiCE with the selected method, displays the counterfactual
 examples as a diff table (what changed), and visualizes the changes.
 """
 
-import streamlit as st
-import pandas as pd
 import numpy as np
+import pandas as pd
+import streamlit as st
 
-from ui.state import init_state, require, nav_buttons
 from core.dice_engine import (
-    generate_counterfactuals,
     CF_METHODS,
+    generate_counterfactuals,
 )
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -53,10 +53,7 @@ current_pred = st.session_state["cf_current_pred"]
 feature_columns = [c for c in clean_df.columns if c != target_column]
 
 # Identify continuous features for DiCE
-continuous_features = [
-    col for col in feature_columns
-    if pd.api.types.is_numeric_dtype(clean_df[col])
-]
+continuous_features = [col for col in feature_columns if pd.api.types.is_numeric_dtype(clean_df[col])]
 
 # ---- Configuration ----
 st.subheader("⚙️ DiCE Configuration")
@@ -103,15 +100,12 @@ if st.button(
     type="primary",
 ):
     # Prepare encoded training data for DiCE
-    from core.preprocessing import encode_input
 
     # Build a training df with encoded features + target
     training_encoded = clean_df.copy()
     for col, le in encoders.items():
         if col in training_encoded.columns:
-            training_encoded[col] = le.transform(
-                training_encoded[col].astype(str)
-            )
+            training_encoded[col] = le.transform(training_encoded[col].astype(str))
 
     with st.spinner(f"Generating counterfactuals with {method_name}…"):
         result = generate_counterfactuals(
@@ -130,10 +124,7 @@ if st.button(
     st.session_state["cf_llm_feedback"] = None
 
     if result.num_cfs_found > 0:
-        st.success(
-            f"✅ Found {result.num_cfs_found} counterfactual(s) "
-            f"in {result.elapsed_seconds:.1f}s."
-        )
+        st.success(f"✅ Found {result.num_cfs_found} counterfactual(s) in {result.elapsed_seconds:.1f}s.")
     else:
         st.warning(
             "⚠️ DiCE could not find counterfactuals for this configuration. "
@@ -159,23 +150,17 @@ if st.session_state.get("cf_results") is not None:
     for col, le in encoders.items():
         if col in cf_display.columns and col != target_column:
             try:
-                cf_display[col] = le.inverse_transform(
-                    cf_display[col].astype(int)
-                )
+                cf_display[col] = le.inverse_transform(cf_display[col].astype(int))
             except (ValueError, IndexError):
                 pass
         if col in orig_display.columns and col != target_column:
             try:
-                orig_display[col] = le.inverse_transform(
-                    orig_display[col].astype(int)
-                )
+                orig_display[col] = le.inverse_transform(orig_display[col].astype(int))
             except (ValueError, IndexError):
                 pass
         if col == target_column and col in cf_display.columns:
             try:
-                cf_display[col] = le.inverse_transform(
-                    cf_display[col].astype(int)
-                )
+                cf_display[col] = le.inverse_transform(cf_display[col].astype(int))
             except (ValueError, IndexError):
                 pass
 
@@ -264,8 +249,7 @@ if st.session_state.get("cf_results") is not None:
         st.metric("Method", method_name)
     with c3:
         avg_changes = (
-            sum(len(c) for c in result.changes_summary) / len(result.changes_summary)
-            if result.changes_summary else 0
+            sum(len(c) for c in result.changes_summary) / len(result.changes_summary) if result.changes_summary else 0
         )
         st.metric("Avg Changes", f"{avg_changes:.1f}")
     with c4:

@@ -1,7 +1,6 @@
 """Tests for core.cache module."""
 
-
-from core.cache import _make_key, get_cached, put_cached, clear_cache
+from core.cache import _make_key, clear_cache, get_cached, put_cached
 
 
 class TestMakeKey:

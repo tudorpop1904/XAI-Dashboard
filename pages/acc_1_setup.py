@@ -7,14 +7,14 @@ Downloads EMNIST dataset and trains the character recognition CNN.
 import streamlit as st
 import torch
 
-from ui.state import init_state, require, nav_buttons
-from ui.accessibility import inject_accessible_theme, accessible_metric
 from core.accessible_cnn import (
-    load_emnist_bundle,
-    train_accessible_model,
-    model_state_bytes,
     NUM_CLASSES,
+    load_emnist_bundle,
+    model_state_bytes,
+    train_accessible_model,
 )
+from ui.accessibility import accessible_metric, inject_accessible_theme
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -67,10 +67,7 @@ if st.button("Download data & train model", type="primary"):
     with st.spinner("Downloading EMNIST dataset (first time may take a minute)…"):
         bundle = load_emnist_bundle(max_per_class=max_per_class)
 
-    st.success(
-        f"✅ Loaded {len(bundle.train_labels)} training + "
-        f"{len(bundle.val_labels)} validation images."
-    )
+    st.success(f"✅ Loaded {len(bundle.train_labels)} training + {len(bundle.val_labels)} validation images.")
 
     progress_bar = st.progress(0, text="Training…")
 

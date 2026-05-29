@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import io
 import random
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import List, Sequence, Tuple
 
 import numpy as np
 import torch
@@ -25,7 +25,7 @@ from PIL import Image, ImageDraw, ImageFont
 class VizMathBundle:
     """Everything needed to train, infer, and explain."""
 
-    class_map: List[Tuple[str, str]]  # (expression_str, answer_str)
+    class_map: list[tuple[str, str]]  # (expression_str, answer_str)
     img_size: int
     train_images: torch.Tensor  # (N, 1, H, W) float 0–1
     train_labels: torch.Tensor  # (N,) long
@@ -45,10 +45,10 @@ def _default_font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
     return ImageFont.load_default()
 
 
-def _build_class_map(num_classes: int, seed: int) -> List[Tuple[str, str]]:
+def _build_class_map(num_classes: int, seed: int) -> list[tuple[str, str]]:
     """Fixed vocabulary of simple expressions and their answers."""
     rng = random.Random(seed)
-    pairs: List[Tuple[str, str]] = []
+    pairs: list[tuple[str, str]] = []
     seen: set[str] = set()
 
     def add(expr: str, ans: str) -> None:
@@ -111,8 +111,8 @@ def generate_synthetic_bundle(
 ) -> VizMathBundle:
     class_map = _build_class_map(num_classes, seed)
     rng = random.Random(seed)
-    images: List[np.ndarray] = []
-    labels: List[int] = []
+    images: list[np.ndarray] = []
+    labels: list[int] = []
     for cls_idx, (expr, _) in enumerate(class_map):
         for _ in range(samples_per_class):
             images.append(render_expression_image(expr, img_size, rng))
@@ -163,7 +163,7 @@ class HandwritingCNN(nn.Module):
         logits, _ = self.forward_with_conv(x)
         return logits
 
-    def forward_with_conv(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward_with_conv(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         conv_out = self.block(x)
         pooled = self.gap(conv_out)
         logits = self.fc(pooled.flatten(1))
@@ -177,7 +177,7 @@ def train_model(
     lr: float = 1e-3,
     device: str | torch.device = "cpu",
     seed: int = 42,
-) -> Tuple[HandwritingCNN, float, dict]:
+) -> tuple[HandwritingCNN, float, dict]:
     torch.manual_seed(seed)
     device = torch.device(device)
     n_cls = len(bundle.class_map)
@@ -235,7 +235,7 @@ def predict_class(
 def grad_cam_on_conv(
     conv_out: torch.Tensor,
     conv_grad: torch.Tensor,
-    target_hw: Tuple[int, int],
+    target_hw: tuple[int, int],
 ) -> np.ndarray:
     """
     conv_out, conv_grad: (C, H, W)
@@ -284,7 +284,7 @@ def grad_cam_for_image(
     model: HandwritingCNN,
     x: torch.Tensor,
     target_class: int,
-    img_hw: Tuple[int, int],
+    img_hw: tuple[int, int],
     device: str | torch.device = "cpu",
 ) -> np.ndarray:
     device = torch.device(device)
@@ -300,7 +300,7 @@ def grad_cam_for_image(
     return grad_cam_on_conv(conv[0].detach(), g[0].detach(), img_hw)
 
 
-def class_to_solution(class_map: Sequence[Tuple[str, str]], cls: int) -> Tuple[str, str]:
+def class_to_solution(class_map: Sequence[tuple[str, str]], cls: int) -> tuple[str, str]:
     expr, ans = class_map[cls]
     return expr, ans
 

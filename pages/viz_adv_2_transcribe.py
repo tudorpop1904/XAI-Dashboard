@@ -8,11 +8,11 @@ side-by-side with the original photos to confirm the read-out is faithful.
 
 import streamlit as st
 
-from ui.state import init_state, require, nav_buttons
 from core.vlm_engine import (
     check_vlm_available,
     transcribe_images,
 )
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -45,19 +45,14 @@ if vlm_ok:
 else:
     st.error(vlm_msg)
     st.info(
-        "💡 Make sure the multimodal model is pulled:\n"
-        "```\n"
-        "docker exec -it xai-ollama ollama pull qwen2.5vl:7b\n"
-        "```"
+        "💡 Make sure the multimodal model is pulled:\n```\ndocker exec -it xai-ollama ollama pull qwen2.5vl:7b\n```"
     )
 
 # ---- Transcription button ----
 images = st.session_state["adv_images"]
 
 if st.button("Run transcription", type="primary", disabled=not vlm_ok):
-    with st.spinner(
-        f"Reading {len(images)} page(s) with VLM — this may take a minute…"
-    ):
+    with st.spinner(f"Reading {len(images)} page(s) with VLM — this may take a minute…"):
         result = transcribe_images(images)
 
     st.session_state["adv_transcription"] = result.latex
@@ -70,10 +65,7 @@ if st.button("Run transcription", type="primary", disabled=not vlm_ok):
     st.session_state["adv_evaluation_raw"] = None
     st.session_state["adv_llm_feedback"] = None
 
-    st.success(
-        f"✅ Transcription complete in {result.elapsed_seconds:.1f}s "
-        f"({result.page_count} page(s))."
-    )
+    st.success(f"✅ Transcription complete in {result.elapsed_seconds:.1f}s ({result.page_count} page(s)).")
 
 # ---- Display transcription ----
 if st.session_state.get("adv_transcription"):
@@ -101,10 +93,7 @@ if st.session_state.get("adv_transcription"):
     # ---- Manual correction ----
     st.divider()
     st.subheader("✏️ Manual Corrections (optional)")
-    st.write(
-        "If the VLM misread something, you can edit the transcription below "
-        "before proceeding to evaluation."
-    )
+    st.write("If the VLM misread something, you can edit the transcription below before proceeding to evaluation.")
 
     corrected = st.text_area(
         "Editable LaTeX transcription",

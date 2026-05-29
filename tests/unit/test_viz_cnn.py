@@ -3,13 +3,13 @@
 import torch
 
 from core.viz_math_cnn import (
-    generate_synthetic_bundle,
     HandwritingCNN,
-    train_model,
+    generate_synthetic_bundle,
     grad_cam_for_image,
     input_saliency,
-    model_state_bytes,
     load_model_from_bytes,
+    model_state_bytes,
+    train_model,
 )
 
 

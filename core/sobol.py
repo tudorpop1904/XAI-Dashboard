@@ -19,16 +19,12 @@ A large reduction means the feature's specific value strongly constrains the mod
 possible outputs, making it a highly influential feature for this specific instance.
 """
 
-
 import numpy as np
 import pandas as pd
 
 
 def variance_attribution(
-    model,
-    X_background: pd.DataFrame,
-    instance: pd.DataFrame,
-    task_type: str = "classification"
+    model, X_background: pd.DataFrame, instance: pd.DataFrame, task_type: str = "classification"
 ) -> list[tuple[str, float]]:
     """
     Compute Variance Reduction feature attributions for a single instance.

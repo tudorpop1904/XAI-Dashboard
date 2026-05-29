@@ -2,8 +2,8 @@
 forms.py — Dynamic input-form generators for prediction.
 """
 
-import streamlit as st
 import pandas as pd
+import streamlit as st
 
 
 def generate_input_form(df, feature_columns):
@@ -26,13 +26,10 @@ def generate_input_form(df, feature_columns):
         unique_vals = series.dropna().unique().tolist()
 
         if (
-            (
-                pd.api.types.is_object_dtype(series)
-                or pd.api.types.is_string_dtype(series)
-                or pd.api.types.is_categorical_dtype(series)
-            )
-            and len(unique_vals) <= 20
-        ):
+            pd.api.types.is_object_dtype(series)
+            or pd.api.types.is_string_dtype(series)
+            or pd.api.types.is_categorical_dtype(series)
+        ) and len(unique_vals) <= 20:
             value = st.selectbox(col, unique_vals, key=f"form_{col}")
 
         elif pd.api.types.is_integer_dtype(series):

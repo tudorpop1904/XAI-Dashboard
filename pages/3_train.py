@@ -6,9 +6,10 @@ trains the model, and shows the accuracy / R² score.
 """
 
 import streamlit as st
-from ui.state import init_state, require, nav_buttons, reset_prediction_state
-from core.preprocessing import preprocess_data, detect_task
+
 from core.models import get_available_models, train_model
+from core.preprocessing import detect_task, preprocess_data
+from ui.state import init_state, nav_buttons, require, reset_prediction_state
 
 init_state()
 
@@ -57,7 +58,6 @@ model_name = st.selectbox(
 # ---- Train button ----
 
 if st.button("Train Model", type="primary"):
-
     with st.spinner(f"Training **{model_name}** on `{target_column}`…"):
         X, y, encoders, task = preprocess_data(clean_df, target_column)
         model, score = train_model(X, y, task, model_name)

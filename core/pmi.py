@@ -13,16 +13,12 @@ P(y_hat | x_j) is the expected probability of predicting y_hat when feature j is
 to x_j, marginalizing over all other features using the background distribution.
 """
 
-
 import numpy as np
 import pandas as pd
 
 
 def pmi_attribution(
-    model,
-    X_background: pd.DataFrame,
-    instance: pd.DataFrame,
-    epsilon: float = 1e-8
+    model, X_background: pd.DataFrame, instance: pd.DataFrame, epsilon: float = 1e-8
 ) -> list[tuple[str, float]]:
     """
     Compute PMI-based feature attributions for a single instance.

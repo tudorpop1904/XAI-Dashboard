@@ -55,7 +55,6 @@ else:
 # ---- Trigger / Display ----
 
 if st.button("Get Counselor's Explanation", type="primary", disabled=not ok):
-
     methods_used = st.session_state.get("xai_methods_used", ["SHAP", "LIME"])
 
     prompt = build_explanation_prompt(

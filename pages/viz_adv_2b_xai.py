@@ -16,18 +16,18 @@ consistency, not accuracy — a fast model that reliably changes its
 output when regions are masked produces equally valid heatmaps.
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
-import matplotlib.pyplot as plt
 
-from ui.state import init_state, require, nav_buttons
 from core.vlm_engine import (
-    check_vlm_available,
-    check_surrogate_available,
-    occlusion_sensitivity,
-    XAI_SURROGATE_MODEL,
     VLM_MODEL,
+    XAI_SURROGATE_MODEL,
+    check_surrogate_available,
+    check_vlm_available,
+    occlusion_sensitivity,
 )
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -62,10 +62,7 @@ surr_ok, surr_msg = check_surrogate_available()
 if surr_ok:
     st.success(surr_msg)
 elif vlm_ok:
-    st.warning(
-        f"Surrogate model not available ({surr_msg}). "
-        f"Will fall back to `{VLM_MODEL}` (slower)."
-    )
+    st.warning(f"Surrogate model not available ({surr_msg}). Will fall back to `{VLM_MODEL}` (slower).")
 else:
     st.error(vlm_msg)
 
@@ -77,13 +74,11 @@ st.subheader("⚙️ XAI Configuration")
 c1, c2 = st.columns(2)
 with c1:
     grid_rows = st.slider(
-        "Grid rows", min_value=2, max_value=6, value=3,
-        help="More rows = finer heatmap but more VLM calls."
+        "Grid rows", min_value=2, max_value=6, value=3, help="More rows = finer heatmap but more VLM calls."
     )
 with c2:
     grid_cols = st.slider(
-        "Grid columns", min_value=2, max_value=6, value=3,
-        help="More columns = finer heatmap but more VLM calls."
+        "Grid columns", min_value=2, max_value=6, value=3, help="More columns = finer heatmap but more VLM calls."
     )
 
 total_cells = grid_rows * grid_cols
@@ -195,18 +190,16 @@ if st.session_state.get("adv_occlusion") is not None:
     st.subheader("📊 Per-Cell Similarity Scores")
 
     # Show grid as a table
-    sim_grid = np.array(result.cell_similarities).reshape(
-        result.grid_rows, result.grid_cols
-    )
+    sim_grid = np.array(result.cell_similarities).reshape(result.grid_rows, result.grid_cols)
 
-    col_labels = [f"Col {c+1}" for c in range(result.grid_cols)]
-    row_labels = [f"Row {r+1}" for r in range(result.grid_rows)]
+    col_labels = [f"Col {c + 1}" for c in range(result.grid_cols)]
+    row_labels = [f"Row {r + 1}" for r in range(result.grid_rows)]
 
     import pandas as pd
+
     sim_df = pd.DataFrame(sim_grid, index=row_labels, columns=col_labels)
     st.dataframe(
-        sim_df.style.background_gradient(cmap="RdYlGn", vmin=0, vmax=1)
-        .format("{:.3f}"),
+        sim_df.style.background_gradient(cmap="RdYlGn", vmin=0, vmax=1).format("{:.3f}"),
         use_container_width=True,
     )
     st.caption(
@@ -217,17 +210,12 @@ if st.session_state.get("adv_occlusion") is not None:
 
     # ---- Expandable per-cell transcriptions ----
     with st.expander("🔍 View individual occluded transcriptions"):
-        for idx, (text, sim) in enumerate(
-            zip(result.cell_texts, result.cell_similarities)
-        ):
+        for idx, (text, sim) in enumerate(zip(result.cell_texts, result.cell_similarities)):
             r = idx // result.grid_cols
             c = idx % result.grid_cols
             importance = 1.0 - sim
             label = "🔴" if importance > 0.5 else "🟡" if importance > 0.2 else "🟢"
-            st.markdown(
-                f"**Cell ({r+1}, {c+1})** — similarity: {sim:.3f} "
-                f"— importance: {importance:.3f} {label}"
-            )
+            st.markdown(f"**Cell ({r + 1}, {c + 1})** — similarity: {sim:.3f} — importance: {importance:.3f} {label}")
             st.text(text[:500] if text else "(empty / VLM returned nothing)")
             st.markdown("---")
 

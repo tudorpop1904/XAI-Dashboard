@@ -45,7 +45,6 @@ st.subheader("Your Profile")
 inputs = generate_input_form(clean_df, feature_columns)
 
 if st.button("Predict my Career", type="primary"):
-
     input_df = pd.DataFrame([inputs])
     encoded_input_df = encode_input(input_df, encoders)
 
@@ -58,9 +57,7 @@ if st.button("Predict my Career", type="primary"):
 
     # Decode if the target was label-encoded
     if task_type == "classification" and target_column in encoders:
-        prediction_display = encoders[target_column].inverse_transform(
-            [int(prediction)]
-        )[0]
+        prediction_display = encoders[target_column].inverse_transform([int(prediction)])[0]
     else:
         prediction_display = prediction
 

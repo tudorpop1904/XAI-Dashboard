@@ -8,13 +8,13 @@ import streamlit as st
 import torch
 from PIL import Image
 
-from ui.state import init_state, require, nav_buttons
 from core.viz_math_cnn import (
+    class_to_solution,
     load_model_from_bytes,
     pil_to_tensor_gray,
     predict_class,
-    class_to_solution,
 )
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -48,9 +48,7 @@ if st.button("Run model", type="primary") and upload is not None:
     cm = st.session_state["viz_class_map"]
     img_size = int(st.session_state["viz_img_size"])
     n_cls = len(cm)
-    device = st.session_state.get("viz_device") or (
-        "cuda" if torch.cuda.is_available() else "cpu"
-    )
+    device = st.session_state.get("viz_device") or ("cuda" if torch.cuda.is_available() else "cpu")
     model = load_model_from_bytes(st.session_state["viz_model_state"], n_cls, device)
     x = pil_to_tensor_gray(pil, img_size)
     pred = predict_class(model, x, device=device)
@@ -68,10 +66,7 @@ if st.button("Run model", type="primary") and upload is not None:
 st.divider()
 st.subheader("Your assessment (skill tracking)")
 
-st.write(
-    "If the read-out was wrong, say so — this feeds the tutor step and "
-    "a rough **self-reported skill** tally."
-)
+st.write("If the read-out was wrong, say so — this feeds the tutor step and a rough **self-reported skill** tally.")
 
 assessment = st.radio(
     "Was the model’s reading correct for your photo?",
@@ -89,13 +84,11 @@ if st.button("Save assessment", type="secondary"):
     if assessment == "Not yet judged":
         st.warning("Pick **Yes** or **No** first.")
     else:
-        st.session_state["viz_skill_attempts"] = int(
-            st.session_state.get("viz_skill_attempts") or 0
-        ) + 1
+        st.session_state["viz_skill_attempts"] = int(st.session_state.get("viz_skill_attempts") or 0) + 1
         if assessment == "Yes, correct":
-            st.session_state["viz_skill_marked_correct"] = int(
-                st.session_state.get("viz_skill_marked_correct") or 0
-            ) + 1
+            st.session_state["viz_skill_marked_correct"] = (
+                int(st.session_state.get("viz_skill_marked_correct") or 0) + 1
+            )
             st.session_state["viz_user_correction"] = None
             st.info("Recorded as **correct**.")
         else:

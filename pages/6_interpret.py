@@ -6,12 +6,13 @@ streams a plain-English "guidance counselor" interpretation.
 """
 
 import streamlit as st
-from ui.state import init_state, require, nav_buttons
+
 from core.llm import (
     build_explanation_prompt,
-    stream_llm_explanation,
     check_ollama_available,
+    stream_llm_explanation,
 )
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -54,7 +55,6 @@ else:
 # ---- Trigger / Display ----
 
 if st.button("Get Counselor's Explanation", type="primary", disabled=not ok):
-
     methods_used = st.session_state.get("xai_methods_used", ["SHAP", "LIME"])
 
     prompt = build_explanation_prompt(

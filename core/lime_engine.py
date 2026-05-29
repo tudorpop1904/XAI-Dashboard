@@ -32,11 +32,7 @@ def build_lime_explainer(X, y, task_type="classification"):
     explainer = LimeTabularExplainer(
         training_data=X.values,
         feature_names=list(X.columns),
-        class_names=(
-            [str(c) for c in sorted(pd.Series(y).unique())]
-            if task_type == "classification"
-            else None
-        ),
+        class_names=([str(c) for c in sorted(pd.Series(y).unique())] if task_type == "classification" else None),
         categorical_features=categorical_features,
         mode=task_type,
         discretize_continuous=True,
@@ -68,7 +64,5 @@ def explain_with_lime(explainer, model, encoded_input_df, task_type="classificat
     lime_list = exp.as_list()
     lime_df = pd.DataFrame(lime_list, columns=["feature", "lime_weight"])
     lime_df["abs_lime_weight"] = lime_df["lime_weight"].abs()
-    lime_df = lime_df.sort_values(by="abs_lime_weight", ascending=False).reset_index(
-        drop=True
-    )
+    lime_df = lime_df.sort_values(by="abs_lime_weight", ascending=False).reset_index(drop=True)
     return lime_df

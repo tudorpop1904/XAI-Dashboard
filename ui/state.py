@@ -7,7 +7,6 @@ page guard functions that redirect when prerequisites are unmet.
 
 import streamlit as st
 
-
 # ---------------------
 # DEFAULT STATE
 # ---------------------
@@ -15,7 +14,6 @@ import streamlit as st
 _DEFAULTS = {
     # XAI category selection
     "xai_category": None,
-
     # Dataset
     "raw_df": None,
     "clean_df": None,
@@ -23,7 +21,6 @@ _DEFAULTS = {
     "dropped_columns": [],
     "dataset_name": None,
     "dataset_path": None,
-
     # Training
     "target_column": None,
     "task_type": None,
@@ -32,18 +29,15 @@ _DEFAULTS = {
     "encoders": {},
     "X": None,
     "y": None,
-
     # Prediction
     "last_input_df": None,
     "last_prediction": None,
     "last_encoded_input_df": None,
-
     # Explanation
     "explanation_runs": [],
     "xai_methods_used": [],
     "num_runs": 5,
     "llm_explanation": None,
-
     # --- Visualization XAI (handwritten math / CNN) ---
     "viz_class_map": None,
     "viz_img_size": None,
@@ -60,7 +54,6 @@ _DEFAULTS = {
     "viz_skill_marked_correct": 0,
     "viz_llm_note": None,
     "viz_device": "cpu",
-
     # --- Advanced Math Tutor (VLM pipeline) ---
     "adv_images": None,
     "adv_image_names": None,
@@ -71,7 +64,6 @@ _DEFAULTS = {
     "adv_evaluation": None,
     "adv_evaluation_raw": None,
     "adv_llm_feedback": None,
-
     # --- Counterfactual Explanations (DiCE) ---
     "cf_input_df": None,
     "cf_encoded_input_df": None,
@@ -82,7 +74,6 @@ _DEFAULTS = {
     "cf_immutable": None,
     "cf_results": None,
     "cf_llm_feedback": None,
-
     # --- Accessible Writing Instructor ---
     "acc_model_state": None,
     "acc_label_map": None,
@@ -113,10 +104,19 @@ def init_state():
 def reset_training_state():
     """Clear model-related state when a new dataset is loaded."""
     keys = [
-        "target_column", "task_type", "model", "model_name",
-        "encoders", "X", "y",
-        "last_input_df", "last_prediction", "last_encoded_input_df",
-        "explanation_runs", "xai_methods_used", "llm_explanation",
+        "target_column",
+        "task_type",
+        "model",
+        "model_name",
+        "encoders",
+        "X",
+        "y",
+        "last_input_df",
+        "last_prediction",
+        "last_encoded_input_df",
+        "explanation_runs",
+        "xai_methods_used",
+        "llm_explanation",
     ]
     for k in keys:
         st.session_state[k] = _DEFAULTS.get(k)
@@ -125,8 +125,12 @@ def reset_training_state():
 def reset_prediction_state():
     """Clear prediction & explanation state when training is redone."""
     keys = [
-        "last_input_df", "last_prediction", "last_encoded_input_df",
-        "explanation_runs", "xai_methods_used", "llm_explanation",
+        "last_input_df",
+        "last_prediction",
+        "last_encoded_input_df",
+        "explanation_runs",
+        "xai_methods_used",
+        "llm_explanation",
     ]
     for k in keys:
         st.session_state[k] = _DEFAULTS.get(k)
@@ -178,6 +182,7 @@ def reset_accessible_flow():
 # PAGE GUARDS
 # ---------------------
 
+
 def require(key, message="Please complete the previous steps first."):
     """
     Guard: if session_state[key] is None / empty, show a warning
@@ -194,6 +199,7 @@ def require(key, message="Please complete the previous steps first."):
 # ---------------------
 # NAVIGATION HELPERS
 # ---------------------
+
 
 def nav_buttons(back_page=None):
     """

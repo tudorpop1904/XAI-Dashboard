@@ -6,17 +6,15 @@ Builds a reproducible synthetic image set (finite expression classes) for CNN tr
 
 import numpy as np
 import streamlit as st
-from ui.state import init_state, require, nav_buttons
+
 from core.viz_math_cnn import generate_synthetic_bundle
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
 require("xai_category", "Please start from the Home page.")
 if st.session_state.get("xai_category") != "visualization":
-    st.warning(
-        "This wizard is for **Visualization XAI**. "
-        "Return to Home and choose “Photomath-style” there."
-    )
+    st.warning("This wizard is for **Visualization XAI**. Return to Home and choose “Photomath-style” there.")
     if st.button("🏠 Home"):
         st.switch_page("pages/1_home.py")
     st.stop()

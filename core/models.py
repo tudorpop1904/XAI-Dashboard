@@ -8,20 +8,19 @@ metadata about which SHAP explainer each model family requires.
 
 import numpy as np
 from sklearn.base import clone
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, r2_score
 
 # ---- Model Imports ----
 from sklearn.ensemble import (
-    RandomForestClassifier,
-    RandomForestRegressor,
     GradientBoostingClassifier,
     GradientBoostingRegressor,
+    RandomForestClassifier,
+    RandomForestRegressor,
 )
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, r2_score
+from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 # ---------------------
 # MODEL REGISTRY
@@ -29,21 +28,13 @@ from sklearn.svm import SVC
 
 MODEL_REGISTRY = {
     "Random Forest": {
-        "classification": RandomForestClassifier(
-            n_estimators=100, random_state=42, n_jobs=-1
-        ),
-        "regression": RandomForestRegressor(
-            n_estimators=100, random_state=42, n_jobs=-1
-        ),
+        "classification": RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1),
+        "regression": RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1),
         "shap_explainer": "tree",
     },
     "Gradient Boosting": {
-        "classification": GradientBoostingClassifier(
-            n_estimators=100, random_state=42
-        ),
-        "regression": GradientBoostingRegressor(
-            n_estimators=100, random_state=42
-        ),
+        "classification": GradientBoostingClassifier(n_estimators=100, random_state=42),
+        "regression": GradientBoostingRegressor(n_estimators=100, random_state=42),
         "shap_explainer": "tree",
     },
     "Decision Tree": {
@@ -74,11 +65,7 @@ def get_available_models(task_type):
     Return model names that support the given task type.
     Filters out models whose entry for the task type is None.
     """
-    return [
-        name
-        for name, entry in MODEL_REGISTRY.items()
-        if entry.get(task_type) is not None
-    ]
+    return [name for name, entry in MODEL_REGISTRY.items() if entry.get(task_type) is not None]
 
 
 def get_shap_explainer_type(model_name):
@@ -111,9 +98,7 @@ def train_model(X, y, task_type, model_name="Random Forest"):
 
     template = entry.get(task_type)
     if template is None:
-        raise ValueError(
-            f"Model '{model_name}' does not support task type '{task_type}'."
-        )
+        raise ValueError(f"Model '{model_name}' does not support task type '{task_type}'.")
 
     # Clone so the registry prototype stays clean
     model = clone(template)
@@ -122,15 +107,9 @@ def train_model(X, y, task_type, model_name="Random Forest"):
     if len(X) > 50_000:
         sampled_idx = X.sample(n=50_000, random_state=42).index
         X = X.loc[sampled_idx]
-        y = (
-            y[sampled_idx]
-            if isinstance(y, np.ndarray)
-            else y.loc[sampled_idx]
-        )
+        y = y[sampled_idx] if isinstance(y, np.ndarray) else y.loc[sampled_idx]
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     model.fit(X_train, y_train)
     preds = model.predict(X_test)

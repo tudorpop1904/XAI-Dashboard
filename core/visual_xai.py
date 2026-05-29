@@ -85,6 +85,7 @@ def visual_pmi_attribution(
 
     # Upscale to shape (H, W)
     from PIL import Image as _PILImage
+
     heatmap_pil = _PILImage.fromarray((pmi_scores * 255).astype(np.uint8), mode="L")
     heatmap_pil = heatmap_pil.resize((w, h), _PILImage.BILINEAR)
     heatmap = np.asarray(heatmap_pil, dtype=np.float32) / 255.0
@@ -154,6 +155,7 @@ def visual_sobol_attribution(
         sobol_grid = np.zeros_like(sobol_grid)
 
     from PIL import Image as _PILImage
+
     heatmap_pil = _PILImage.fromarray((sobol_grid * 255).astype(np.uint8), mode="L")
     heatmap_pil = heatmap_pil.resize((w, h), _PILImage.BILINEAR)
     heatmap = np.asarray(heatmap_pil, dtype=np.float32) / 255.0

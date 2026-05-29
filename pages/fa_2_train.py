@@ -66,10 +66,7 @@ if st.button("Train Model(s)", type="primary"):
             X, y, encoders, task = preprocess_data(clean_df, target_column)
             for name in selected_model_names:
                 model, score = train_model(X, y, task, name)
-                trained_models[name] = {
-                    "model": model,
-                    "score": score
-                }
+                trained_models[name] = {"model": model, "score": score}
 
         # Save to session state
         st.session_state["trained_models"] = trained_models
@@ -96,12 +93,10 @@ if st.session_state.get("trained_models") is not None:
     metric_name = "Accuracy" if st.session_state["task_type"] == "classification" else "R² Score"
     comparison_data = []
     for name, info in st.session_state["trained_models"].items():
-        comparison_data.append({
-            "Model Name": name,
-            metric_name: info["score"]
-        })
+        comparison_data.append({"Model Name": name, metric_name: info["score"]})
 
     import pandas as pd
+
     comp_df = pd.DataFrame(comparison_data)
     st.dataframe(
         comp_df.style.background_gradient(cmap="Blues", subset=[metric_name]).format({metric_name: "{:.4f}"}),
@@ -112,7 +107,7 @@ if st.session_state.get("trained_models") is not None:
     active_model_name = st.selectbox(
         "Choose which model to use for Prediction & Explanation:",
         list(st.session_state["trained_models"].keys()),
-        index=list(st.session_state["trained_models"].keys()).index(st.session_state["model_name"])
+        index=list(st.session_state["trained_models"].keys()).index(st.session_state["model_name"]),
     )
 
     # Update active model in session state

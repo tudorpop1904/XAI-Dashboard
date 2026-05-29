@@ -5,17 +5,17 @@ Shows the child (or their instructor) WHERE the AI looked when
 recognizing the character — reuses the white-box XAI methods.
 """
 
-import streamlit as st
 import matplotlib.pyplot as plt
+import streamlit as st
 import torch
 
-from ui.state import init_state, require, nav_buttons
-from ui.accessibility import inject_accessible_theme
 from core.accessible_cnn import (
-    load_model_from_bytes,
     grad_cam_accessible,
+    load_model_from_bytes,
     saliency_accessible,
 )
+from ui.accessibility import inject_accessible_theme
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 

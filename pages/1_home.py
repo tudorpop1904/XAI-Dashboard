@@ -5,13 +5,14 @@ Lets the user choose the XAI task category.
 """
 
 import streamlit as st
+
 from ui.state import (
     init_state,
-    reset_feature_attribution_flow,
-    reset_visualization_flow,
+    reset_accessible_flow,
     reset_advanced_tutor_flow,
     reset_counterfactual_flow,
-    reset_accessible_flow,
+    reset_feature_attribution_flow,
+    reset_visualization_flow,
 )
 
 init_state()
@@ -82,8 +83,8 @@ with col4:
     st.markdown("### 🔄 Counterfactual Explanations")
     st.caption("DiCE · What-if · Actionable career changes")
     st.write(
-        "Given a career prediction, ask *\"what would I need to change "
-        "to get a different career?\"* DiCE generates diverse counterfactual "
+        'Given a career prediction, ask *"what would I need to change '
+        'to get a different career?"* DiCE generates diverse counterfactual '
         "paths with **immutability constraints** and an LLM counselor."
     )
     if st.button("Start Counterfactual XAI", type="primary", use_container_width=True):

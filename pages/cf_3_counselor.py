@@ -8,8 +8,8 @@ career advice.
 
 import streamlit as st
 
-from ui.state import init_state, require, nav_buttons
-from core.llm import stream_llm_explanation, check_ollama_available
+from core.llm import check_ollama_available, stream_llm_explanation
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -51,7 +51,6 @@ def _build_cf_counselor_prompt() -> str:
         "guidance counselor. A student used an AI career prediction system "
         "and wants to know what they need to change to reach a different "
         "career path.\n\n",
-
         "## Context\n",
         f"- **Current prediction:** {current_pred}\n",
         f"- **Desired career:** {desired_career}\n",
@@ -62,13 +61,13 @@ def _build_cf_counselor_prompt() -> str:
     if immutable:
         parts.append(f"- **Locked features (can't change):** {', '.join(immutable)}\n")
 
-    parts.append(f"\n**Student's current profile:**\n")
+    parts.append("\n**Student's current profile:**\n")
     for col in input_df.columns:
         parts.append(f"  - {col}: {input_df.iloc[0][col]}\n")
 
-    parts.append(f"\n**Counterfactual changes suggested by DiCE:**\n")
+    parts.append("\n**Counterfactual changes suggested by DiCE:**\n")
     for i, changes in enumerate(result.changes_summary):
-        parts.append(f"\nPath #{i+1}:\n")
+        parts.append(f"\nPath #{i + 1}:\n")
         if not changes:
             parts.append("  (No changes needed)\n")
         else:

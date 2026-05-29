@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from core.preprocessing import preprocess_data, encode_input, detect_task
+from core.preprocessing import detect_task, encode_input, preprocess_data
 
 
 class TestDetectTask:

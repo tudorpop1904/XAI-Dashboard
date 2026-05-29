@@ -11,12 +11,12 @@ for correctness, and produces:
 
 import streamlit as st
 
-from ui.state import init_state, require, nav_buttons
 from core.vlm_engine import (
+    Verdict,
     check_eval_available,
     evaluate_solution,
-    Verdict,
 )
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 

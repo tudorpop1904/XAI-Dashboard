@@ -13,11 +13,9 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass
-from typing import Dict, List, Optional
 
 import dice_ml
 import pandas as pd
-
 
 # ─────────────────────────────────────────────
 # CF Generation Methods
@@ -43,14 +41,16 @@ CF_METHODS = {
 # Data Structures
 # ─────────────────────────────────────────────
 
+
 @dataclass
 class CounterfactualResult:
     """Result of a single CF generation run."""
+
     method: str
     desired_class: str
-    cf_df: pd.DataFrame               # The counterfactual examples
-    original_input: pd.DataFrame       # The user's original input
-    changes_summary: List[Dict]        # Per-CF list of {feature: (old, new)}
+    cf_df: pd.DataFrame  # The counterfactual examples
+    original_input: pd.DataFrame  # The user's original input
+    changes_summary: list[dict]  # Per-CF list of {feature: (old, new)}
     num_cfs_found: int
     elapsed_seconds: float = 0.0
 
@@ -59,17 +59,18 @@ class CounterfactualResult:
 # Core Engine
 # ─────────────────────────────────────────────
 
+
 def generate_counterfactuals(
     model,
     training_df: pd.DataFrame,
     target_column: str,
     input_row: pd.DataFrame,
     desired_class: str | int,
-    continuous_features: List[str],
+    continuous_features: list[str],
     method: str = "random",
     num_cfs: int = 4,
-    features_to_vary: Optional[List[str]] = None,
-    permitted_range: Optional[Dict[str, List]] = None,
+    features_to_vary: list[str] | None = None,
+    permitted_range: dict[str, list] | None = None,
 ) -> CounterfactualResult:
     """
     Generate diverse counterfactual explanations using DiCE.

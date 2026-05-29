@@ -64,8 +64,8 @@ with col3:
     st.markdown("### 🔄 Counterfactual Explanations")
     st.caption("DiCE · What-if · Actionable career changes")
     st.write(
-        "Given a career prediction, ask *\"what would I need to change "
-        "to get a different career?\"* DiCE generates diverse counterfactual "
+        'Given a career prediction, ask *"what would I need to change '
+        'to get a different career?"* DiCE generates diverse counterfactual '
         "paths with **immutability constraints** and an LLM counselor."
     )
     if st.button("Start Counterfactual XAI", type="primary", use_container_width=True):

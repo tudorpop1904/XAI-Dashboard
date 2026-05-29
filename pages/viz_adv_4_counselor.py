@@ -8,9 +8,9 @@ tailored to the full-page math review workflow.
 
 import streamlit as st
 
-from ui.state import init_state, require, nav_buttons
-from core.vlm_engine import check_eval_available, Verdict
 from core.llm import stream_llm_explanation
+from core.vlm_engine import Verdict, check_eval_available
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -38,6 +38,7 @@ st.divider()
 
 # ---- Build counselor prompt ----
 
+
 def _build_adv_counselor_prompt() -> str:
     """Construct the counselor prompt from evaluation state."""
     result = st.session_state["adv_evaluation"]
@@ -49,7 +50,6 @@ def _build_adv_counselor_prompt() -> str:
         "mathematical solution which has been transcribed and evaluated by "
         "an AI grader. Your job is to provide a personalised, student-friendly "
         "explanation of the evaluation results.\n\n",
-
         "Guidelines:\n"
         "- Be encouraging even if the work has errors.\n"
         "- Explain mathematical concepts at an undergraduate level.\n"
@@ -60,7 +60,6 @@ def _build_adv_counselor_prompt() -> str:
         "  error is a common mistake and HOW to avoid it.\n"
         "- Keep your response under 400 words.\n"
         "- Use LaTeX (with $ delimiters) for any mathematical expressions.\n\n",
-
         f"**Verdict:** {result.verdict.value.replace('_', ' ').title()}\n\n",
         f"**Summary from grader:** {result.summary}\n\n",
     ]
@@ -77,9 +76,7 @@ def _build_adv_counselor_prompt() -> str:
     if result.practice_problems:
         parts.append(f"**Practice problems suggested:** {result.practice_problems}\n\n")
 
-    parts.append(
-        f"**Student's original work (LaTeX transcription):**\n{latex}\n\n"
-    )
+    parts.append(f"**Student's original work (LaTeX transcription):**\n{latex}\n\n")
 
     parts.append(
         "Now write your personalised counselor feedback for the student. "

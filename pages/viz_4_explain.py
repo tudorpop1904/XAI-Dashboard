@@ -2,17 +2,17 @@
 viz_4_explain.py — Grad-CAM and saliency map overlays for the last prediction image.
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
 import streamlit as st
 import torch
-import matplotlib.pyplot as plt
 
-from ui.state import init_state, require, nav_buttons
 from core.viz_math_cnn import (
-    load_model_from_bytes,
     grad_cam_for_image,
     input_saliency,
+    load_model_from_bytes,
 )
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 
@@ -39,9 +39,7 @@ st.divider()
 
 cm = st.session_state["viz_class_map"]
 n_cls = len(cm)
-device = st.session_state.get("viz_device") or (
-    "cuda" if torch.cuda.is_available() else "cpu"
-)
+device = st.session_state.get("viz_device") or ("cuda" if torch.cuda.is_available() else "cpu")
 model = load_model_from_bytes(st.session_state["viz_model_state"], n_cls, device)
 x_np = st.session_state["viz_last_x_np"]
 pred_cls = int(st.session_state["viz_last_pred_class"])
@@ -74,10 +72,7 @@ axes[2].axis("off")
 plt.tight_layout()
 st.pyplot(fig, clear_figure=True)
 
-st.caption(
-    f"Target class index: **{pred_cls}** "
-    f"(`{st.session_state.get('viz_last_expression')}`)"
-)
+st.caption(f"Target class index: **{pred_cls}** (`{st.session_state.get('viz_last_expression')}`)")
 
 st.divider()
 

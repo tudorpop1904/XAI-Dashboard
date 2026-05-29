@@ -3,12 +3,13 @@ viz_5_counselor.py — LLM tutor note for the visualization + XAI track.
 """
 
 import streamlit as st
-from ui.state import init_state, require, nav_buttons
+
 from core.llm import (
     build_viz_counselor_prompt,
-    stream_llm_explanation,
     check_ollama_available,
+    stream_llm_explanation,
 )
+from ui.state import init_state, nav_buttons, require
 
 init_state()
 

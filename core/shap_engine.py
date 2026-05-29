@@ -5,14 +5,14 @@ Selects TreeExplainer, LinearExplainer, or KernelExplainer
 based on the model family, then normalises outputs into a DataFrame.
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import shap
-
 
 # ---------------------
 # EXPLAINER BUILDERS
 # ---------------------
+
 
 def build_shap_explainer(model, X_background, explainer_type="tree"):
     """
@@ -37,9 +37,7 @@ def build_shap_explainer(model, X_background, explainer_type="tree"):
         bg = shap.sample(X_background, min(100, len(X_background)))
 
         # Use predict_proba if available, else predict
-        predict_fn = (
-            model.predict_proba if hasattr(model, "predict_proba") else model.predict
-        )
+        predict_fn = model.predict_proba if hasattr(model, "predict_proba") else model.predict
         return shap.KernelExplainer(predict_fn, bg)
 
     raise ValueError(f"Unsupported SHAP explainer type: {explainer_type}")
@@ -48,6 +46,7 @@ def build_shap_explainer(model, X_background, explainer_type="tree"):
 # ---------------------
 # SHAP VALUE COMPUTATION
 # ---------------------
+
 
 def compute_shap_values(explainer, input_df):
     """
@@ -60,6 +59,7 @@ def compute_shap_values(explainer, input_df):
 # ---------------------
 # UTILITIES
 # ---------------------
+
 
 def get_predicted_class_index(model, encoded_input_df):
     """For classifiers, return the index of the predicted class."""
@@ -99,14 +99,14 @@ def shap_values_to_dataframe(shap_values, input_df, predicted_class_idx=1):
     else:
         raise ValueError(f"Unsupported SHAP output type: {type(shap_values)}")
 
-    shap_df = pd.DataFrame({
-        "feature": feature_names,
-        "shap_value": values,
-    })
-    shap_df["abs_shap_value"] = shap_df["shap_value"].abs()
-    shap_df = shap_df.sort_values(by="abs_shap_value", ascending=False).reset_index(
-        drop=True
+    shap_df = pd.DataFrame(
+        {
+            "feature": feature_names,
+            "shap_value": values,
+        }
     )
+    shap_df["abs_shap_value"] = shap_df["shap_value"].abs()
+    shap_df = shap_df.sort_values(by="abs_shap_value", ascending=False).reset_index(drop=True)
     return shap_df
 
 

@@ -5,8 +5,8 @@ Handles label encoding for categorical features and target columns,
 task-type detection, and input encoding at prediction time.
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
 
