@@ -55,7 +55,7 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -f docker/Dockerfile -t xai-app:${BUILD_NUMBER} -t xai-app:latest .'
+                sh 'docker build -f docker/Dockerfile.app -t xai-app:${BUILD_NUMBER} -t xai-app:latest .'
             }
         }
 
