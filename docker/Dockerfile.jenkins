@@ -11,4 +11,7 @@ RUN apt-get update && \
     docker-cli \
     && rm -rf /var/lib/apt/lists/*
 
+# Add jenkins user to docker and root groups so it has permission to access the Docker socket
+RUN usermod -aG docker,root jenkins
+
 USER jenkins
