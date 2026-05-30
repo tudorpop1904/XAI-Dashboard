@@ -22,5 +22,4 @@ models/
 tests/
 docs/
 Jenkinsfile
-requirements-dev.txt
 demo/
