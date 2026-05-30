@@ -63,7 +63,7 @@ pipeline {
             steps {
                 echo 'Deploying application stack to the local Docker daemon...'
                 // Start/recreate all services in detached mode
-                sh 'docker compose -f docker/docker-compose.yml up -d'
+                sh 'docker compose --file docker/docker-compose.yml up -d'
             }
         }
     }
