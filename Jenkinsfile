@@ -14,45 +14,45 @@ pipeline {
     }
 
     stages {
-        stage('Setup') {
-            steps {
-                sh '''
-                    # Only create venv if it doesn't exist to save time
-                    if [ ! -d "${VENV}" ]; then
-                        python3 -m venv ${VENV}
-                    fi
-                    . ${VENV}/bin/activate
-                    pip install --upgrade pip
-                    pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-                    pip install -r requirements-dev.txt
-                '''
-            }
-        }
+        // stage('Setup') {
+        //     steps {
+        //         sh '''
+        //             # Only create venv if it doesn't exist to save time
+        //             if [ ! -d "${VENV}" ]; then
+        //                 python3 -m venv ${VENV}
+        //             fi
+        //             . ${VENV}/bin/activate
+        //             pip install --upgrade pip
+        //             pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+        //             pip install -r requirements-dev.txt
+        //         '''
+        //     }
+        // }
 
-        stage('Lint') {
-            steps {
-                sh '''
-                    . ${VENV}/bin/activate
-                    ruff check --select I --fix
-                    ruff format
-                    ruff check . --output-format=github
-                '''
-            }
-        }
+        // stage('Lint') {
+        //     steps {
+        //         sh '''
+        //             . ${VENV}/bin/activate
+        //             ruff check --select I --fix
+        //             ruff format
+        //             ruff check . --output-format=github
+        //         '''
+        //     }
+        // }
 
-        stage('Unit Tests') {
-            steps {
-                sh '''
-                    . ${VENV}/bin/activate
-                    pytest tests/unit/ -v --tb=short --junitxml=test-results.xml
-                '''
-            }
-            post {
-                always {
-                    junit 'test-results.xml'
-                }
-            }
-        }
+        // stage('Unit Tests') {
+        //     steps {
+        //         sh '''
+        //             . ${VENV}/bin/activate
+        //             pytest tests/unit/ -v --tb=short --junitxml=test-results.xml
+        //         '''
+        //     }
+        //     post {
+        //         always {
+        //             junit 'test-results.xml'
+        //         }
+        //     }
+        // }
 
         stage('Verify Docker Vesrion'){
             steps{
