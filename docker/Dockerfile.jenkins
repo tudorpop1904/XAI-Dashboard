@@ -9,6 +9,7 @@ RUN apt-get update && \
     python3-venv \
     docker.io \
     docker-cli \
+    docker-compose \
     && rm -rf /var/lib/apt/lists/*
 
 # Add jenkins user to docker and root groups so it has permission to access the Docker socket
