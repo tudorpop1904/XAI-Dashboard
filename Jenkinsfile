@@ -55,9 +55,6 @@ pipeline {
         }
 
         stage('Docker Build & Deploy') {
-            when {
-                branch 'release/*' || branch 'v0.2/*'
-            }
             steps {
                 echo 'Building and Deploying application stack to the local Docker daemon...'
                 sh 'docker compose -f docker/docker-compose.yml up -d --build --remove-orphans'
