@@ -31,8 +31,10 @@ services:
   # ---- Local LLM server ----
   ollama:
     image: ollama/ollama:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.ollama
     container_name: xai-ollama
-    entrypoint: [ "/bin/bash", "/entrypoint.sh" ]
     ports:
       - "11434:11434"
     volumes:
@@ -48,9 +50,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 10G
+          memory: 12G
         reservations:
-          memory: 10G
+          memory: 12G
           devices:
             - driver: nvidia
               count: all
@@ -69,8 +71,10 @@ services:
     volumes:
       - jenkins_data:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+      - docker_buildkit_cache:/var/lib/docker/buildkit
     restart: unless-stopped
 
 volumes:
   ollama_data:
   jenkins_data:
+  docker_buildkit_cache:

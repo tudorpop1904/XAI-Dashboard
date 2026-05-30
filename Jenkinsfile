@@ -54,28 +54,14 @@ pipeline {
             }
         }
 
-        stage('Verify Docker Vesrion'){
-            steps{
-                sh 'docker --version'
-                sh 'docker compose version --short'
+        stage('Docker Build & Deploy') {
+            when {
+                branch 'release/*' || branch 'v0.2/*'
             }
-        }
-
-        stage('Docker Build') {
             steps {
-                sh 'docker build -f docker/Dockerfile.app -t xai-app:${BUILD_NUMBER} -t xai-app:latest .'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying application stack to the local Docker daemon...'
-                // Start/recreate all services in detached mode
-                sh 'docker compose -f docker/docker-compose.yml up -d --remove-orphans'
+                echo 'Building and Deploying application stack to the local Docker daemon...'
+                sh 'docker compose -f docker/docker-compose.yml up -d --build --remove-orphans'
             }
         }
     }
-
-    // Removed cleanWs() so the .venv-ci directory persists across builds
-    // making subsequent runs MUCH faster.
 }
