@@ -56,7 +56,9 @@ pipeline {
 
         stage('Verify Docker Vesrion'){
             steps{
-                sh 'docker compose version'
+                sh 'docker --version'
+                sh 'docker-compose --version'
+                sh 'which docker-compose'
             }
         }
 
