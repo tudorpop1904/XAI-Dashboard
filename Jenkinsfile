@@ -4,6 +4,7 @@ pipeline {
     triggers {
         // Automatically check for new commits every 5 minutes
         pollSCM('H/5 * * * *')
+        githubPush()
     }
 
     environment {
@@ -53,9 +54,15 @@ pipeline {
             }
         }
 
+        stage('Verify Docker Vesrion'){
+            steps{
+                sh 'docker compose version'
+            }
+        }
+
         stage('Docker Build') {
             steps {
-                sh 'docker build -f docker/Dockerfile.app -t xai-app:${BUILD_NUMBER} -t xai-app:latest .'
+                sh '# docker build -f docker/Dockerfile.app -t xai-app:${BUILD_NUMBER} -t xai-app:latest .'
             }
         }
 
@@ -63,7 +70,7 @@ pipeline {
             steps {
                 echo 'Deploying application stack to the local Docker daemon...'
                 // Start/recreate all services in detached mode
-                sh 'docker compose --file docker/docker-compose.yml up -d'
+                sh '# docker compose -f docker/docker-compose.yml up -d --remove-orphans'
             }
         }
     }
