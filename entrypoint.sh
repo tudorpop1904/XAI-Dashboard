@@ -1,13 +1,25 @@
 #!/bin/bash
 set -e
 
-# ─────────────────────────────────────────────
+# ──────────────────────────────────────────────────────
 # Ollama container entrypoint
 #   1. Start ollama serve in the background
 #   2. Wait until the server is responsive
-#   3. Pull the required models
+#   3. Ensure the required models (Pull if absent, skip otherwise)
 #   4. Keep the server running in the foreground
-# ─────────────────────────────────────────────
+# ──────────────────────────────────────────────────────
+
+ensure_model() {
+    local MODEL="$1"
+
+    if ollama list | grep -q "^${MODEL}"; then
+        echo "✓ ${MODEL} already pulled"
+    else
+        echo "Downloading ${MODEL} ..."
+        ollama pull "${MODEL}"
+    fi
+}
+
 
 # Start the Ollama server in the background
 ollama serve &
@@ -32,17 +44,17 @@ echo "Ollama server is ready! (took ${WAITED}s)"
 # Pull models (skips download if already present)
 echo ""
 echo "Pulling LLM model (llama3.1:8b-instruct-q4_K_M)..."
-ollama pull llama3.1:8b-instruct-q4_K_M
+ensure_model llama3.1:8b-instruct-q4_K_M
 echo "✓ llama3.1:8b-instruct-q4_K_M ready"
 
 echo ""
 echo "Pulling VLM model (qwen2.5vl:7b-q4_K_M)..."
-ollama pull qwen2.5vl:7b-q4_K_M
+ensure_model qwen2.5vl:7b-q4_K_M
 echo "✓ qwen2.5vl:7b-q4_K_M ready"
 
 echo ""
 echo "Pulling XAI surrogate model (minicpm-v)..."
-ollama pull minicpm-v
+ensure_model minicpm-v
 echo "✓ minicpm-v ready"
 
 

@@ -1,0 +1,5 @@
+Instance,Time,Storage
+Jenkins Cold Start,3m20s,1.99GiB
+Suggested Plugins,2m40s,175.4MiB
+Docker Pipeline & Slack Dependencies,15s,5.5MiB
+Pipeline Run,28m,31.9GiB

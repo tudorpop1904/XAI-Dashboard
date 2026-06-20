@@ -2,48 +2,33 @@ pipeline {
     agent any
 
     triggers {
-        // Automatically check for new commits every 5 minutes
         pollSCM('H/5 * * * *')
         githubPush()
     }
 
     environment {
-        VENV = '.venv-ci'
-        // Persist pip cache across builds so we don't redownload Torch
         PIP_CACHE_DIR = "${JENKINS_HOME}/.cache/pip"
     }
 
     stages {
-        stage('Setup') {
-            steps {
-                sh '''
-                    # Only create venv if it doesn't exist to save time
-                    if [ ! -d "${VENV}" ]; then
-                        python3 -m venv ${VENV}
-                    fi
-                    . ${VENV}/bin/activate
-                    pip install --upgrade pip
-                    pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-                    pip install -r requirements-dev.txt
-                '''
-            }
-        }
 
+        /* ---------------- CI: LINT ---------------- */
         stage('Lint') {
             steps {
                 sh '''
-                    . ${VENV}/bin/activate
-                    ruff check --select I --fix
-                    ruff format
+                    python3 -m pip install --upgrade pip
+                    pip install ruff
                     ruff check . --output-format=github
                 '''
             }
         }
 
+        /* ---------------- CI: TEST ---------------- */
         stage('Unit Tests') {
             steps {
                 sh '''
-                    . ${VENV}/bin/activate
+                    python3 -m pip install --upgrade pip
+                    pip install pytest pytest-cov
                     pytest tests/unit/ -v --tb=short --junitxml=test-results.xml
                 '''
             }
@@ -54,10 +39,59 @@ pipeline {
             }
         }
 
-        stage('Docker Build & Deploy') {
+        /* ---------------- BUILD (OPTIMIZED) ---------------- */
+        stage('Build Images') {
+
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'release/*'
+                }
+                expression {
+                    return filesChanged([
+                        "docker/**",
+                        "core/**",
+                        "pages/**",
+                        "ui/**",
+                        "requirements.txt",
+                        "Dockerfile*"
+                    ])
+                }
+            }
+
             steps {
-                echo 'Building and Deploying application stack to the local Docker daemon...'
-                sh 'docker compose -f docker/docker-compose.yml up -d --build --remove-orphans'
+                sh '''
+                    export DOCKER_BUILDKIT=1
+
+                    docker buildx build \
+                        -f docker/Dockerfile.app \
+                        -t xai-app:latest \
+                        --cache-from=type=local,src=/tmp/.buildx-cache \
+                        --cache-to=type=local,dest=/tmp/.buildx-cache-new \
+                        .
+
+                    docker buildx build \
+                        -f docker/Dockerfile.ollama \
+                        -t xai-ollama:latest \
+                        --cache-from=type=local,src=/tmp/.buildx-cache \
+                        --cache-to=type=local,dest=/tmp/.buildx-cache-new \
+                        .
+                '''
+
+                sh 'rm -rf /tmp/.buildx-cache && mv /tmp/.buildx-cache-new /tmp/.buildx-cache'
+            }
+        }
+
+        /* ---------------- DEPLOY ---------------- */
+        stage('Deploy') {
+            when {
+                branch 'main'
+            }
+
+            steps {
+                sh '''
+                    docker compose -f docker/docker-compose.yml up -d --remove-orphans
+                '''
             }
         }
     }
