@@ -8,6 +8,11 @@ set -euo pipefail
 #   ssh -i <key> ubuntu@<vm-ip> 'bash -s' < deploy/setup-cloud.sh
 # ──────────────────────────────────────────────────────────────────────
 
+green()  { printf "\033[32m%s\033[0m" "$1"; }
+red()    { printf "\033[31m%s\033[0m" "$1"; }
+yellow() { printf "\033[33m%s\033[0m" "$1"; }
+bold()   { printf "\033[1m%s\033[0m" "$1"; }
+
 echo "=== XAI Dashboard — Microsoft Azure VM Setup ==="
 
 # 1. Update system
@@ -19,18 +24,18 @@ echo "[2/5] Installing Docker..."
 if ! command -v docker &> /dev/null; then
     curl -fsSL https://get.docker.com | sudo sh
     sudo usermod -aG docker "$USER"
-    echo "  ✓ Docker installed. You may need to re-login for group changes."
+    echo "  $(green '✓') Docker installed. You may need to re-login for group changes."
 else
-    echo "  ✓ Docker already installed."
+    echo "  $(green '✓') Docker already installed."
 fi
 
 # 3. Install Docker Compose plugin
 echo "[3/5] Ensuring Docker Compose plugin..."
 if ! docker compose version &> /dev/null; then
     sudo apt-get install -y -qq docker-compose-plugin
-    echo "  ✓ Docker Compose plugin installed."
+    echo "  $(green '✓') Docker Compose plugin installed."
 else
-    echo "  ✓ Docker Compose already available."
+    echo "  $(green '✓') Docker Compose already available."
 fi
 
 # 4. Open firewall ports (Streamlit 8501, Ollama 11434)
@@ -38,27 +43,27 @@ echo "[4/5] Configuring iptables for ports 8501 and 11434..."
 sudo iptables -I INPUT -m state --state NEW -p tcp --dport 8501 -j ACCEPT
 sudo iptables -I INPUT -m state --state NEW -p tcp --dport 11434 -j ACCEPT
 sudo netfilter-persistent save 2>/dev/null || true
-echo "  ✓ Ports 8501 and 11434 opened."
+echo "  $(green '✓') Ports 8501 and 11434 opened."
 
 # 5. Clone the repository (if not present)
 echo "[5/5] Cloning repository..."
 REPO_DIR="$HOME/xai-app"
 if [ ! -d "$REPO_DIR" ]; then
     git clone https://github.com/tudorpop1904/XAI-Dashboard.git "$REPO_DIR"
-    echo "  ✓ Repository cloned to $REPO_DIR"
+    echo "  $(green '✓') Repository cloned to $REPO_DIR"
 else
-    echo "  ✓ Repository already exists at $REPO_DIR"
+    echo "  $(green '✓') Repository already exists at $REPO_DIR"
 fi
 git checkout v0.2/logistics-and-metrics
 git pull
-
+echo "  $(green '✓') Switched to branch v0.2/logistics-and-metrics and pulled latest changes"
 
 # Create .env if not present
 if [ ! -f "$REPO_DIR/.env" ]; then
     echo "# Kaggle credentials (optional, only needed for dataset downloads)" > "$REPO_DIR/.env"
     echo "KAGGLE_USERNAME=" >> "$REPO_DIR/.env"
     echo "KAGGLE_API_TOKEN=" >> "$REPO_DIR/.env"
-    echo "  ✓ Created .env template — fill in Kaggle creds if needed."
+    echo "  $(green '✓') Created .env template — fill in Kaggle creds if needed."
 fi
 
 echo ""
