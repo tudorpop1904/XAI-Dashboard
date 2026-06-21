@@ -54,6 +54,7 @@ if [ ! -d "$REPO_DIR" ]; then
 else
     echo "  $(green '✓') Repository already exists at $REPO_DIR"
 fi
+cd "$REPO_DIR"
 git checkout v0.2/logistics-and-metrics
 git pull
 echo "  $(green '✓') Switched to branch v0.2/logistics-and-metrics and pulled latest changes"
