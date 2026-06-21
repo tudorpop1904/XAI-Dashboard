@@ -49,6 +49,9 @@ if [ ! -d "$REPO_DIR" ]; then
 else
     echo "  ✓ Repository already exists at $REPO_DIR"
 fi
+git checkout v0.2/logistics-and-metrics
+git pull
+
 
 # Create .env if not present
 if [ ! -f "$REPO_DIR/.env" ]; then
