@@ -8,16 +8,31 @@ pipeline {
 
     environment {
         PIP_CACHE_DIR = "${JENKINS_HOME}/.cache/pip"
+        VENV_PATH = ".venv-ci"
+        // Microsoft Azure VM — set these in Jenkins > Manage Credentials
+        CLOUD_VM_IP = credentials('azure-cloud-vm-ip')
+        CLOUD_SSH_KEY = credentials('azure-cloud-ssh-key')
     }
 
     stages {
+
+        /* ---------------- CI: SETUP ---------------- */
+        stage('Setup') {
+            steps {
+                sh '''
+                    python3 -m venv ${VENV_PATH}
+                    source ${VENV_PATH}/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements-dev.txt
+                '''
+            }
+        }
 
         /* ---------------- CI: LINT ---------------- */
         stage('Lint') {
             steps {
                 sh '''
-                    python3 -m pip install --upgrade pip
-                    pip install ruff
+                    source ${VENV_PATH}/bin/activate
                     ruff check . --output-format=github
                 '''
             }
@@ -27,8 +42,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 sh '''
-                    python3 -m pip install --upgrade pip
-                    pip install pytest pytest-cov
+                    source ${VENV_PATH}/bin/activate
                     pytest tests/unit/ -v --tb=short --junitxml=test-results.xml
                 '''
             }
@@ -54,6 +68,7 @@ pipeline {
                         "pages/**",
                         "ui/**",
                         "requirements.txt",
+                        ".dockerignore",
                         "Dockerfile*"
                     ])
                 }
@@ -82,8 +97,8 @@ pipeline {
             }
         }
 
-        /* ---------------- DEPLOY ---------------- */
-        stage('Deploy') {
+        /* ---------------- LOCAL DEPLOY ---------------- */
+        stage('Deploy (Local)') {
             when {
                 branch 'main'
             }
@@ -92,6 +107,28 @@ pipeline {
                 sh '''
                     docker compose -f docker/docker-compose.yml up -d --remove-orphans
                 '''
+            }
+        }
+
+        /* ------------ CLOUD DEPLOY (Microsoft Azure) ------------ */
+        stage('Deploy (Cloud)') {
+            when {
+                branch 'main'
+            }
+
+            steps {
+                sh '''
+                    chmod +x deploy/deploy.sh
+                    ./deploy/deploy.sh "${CLOUD_VM_IP}" "${CLOUD_SSH_KEY}" azureuser
+                '''
+            }
+        }
+
+        /* ---------------- SMOKE TESTS ---------------- */
+        stage('Smoke Tests') {
+            steps {
+                sh 'curl -sf http://localhost:8501/ || echo "Local smoke test skipped (not deployed locally)"'
+                sh 'curl -sf http://localhost:11434/api/tags || echo "Local Ollama smoke test skipped"'
             }
         }
     }

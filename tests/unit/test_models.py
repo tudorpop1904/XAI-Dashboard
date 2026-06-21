@@ -67,3 +67,11 @@ class TestTrainModel:
         X, y, _, task = preprocess_data(sample_career_df, "career")
         with pytest.raises(ValueError):
             train_model(X, y, task, "NonExistentModel")
+
+    def test_unsupported_task_type_raises(self, sample_career_df):
+        """Logistic Regression doesn't support regression — should raise."""
+        from core.preprocessing import preprocess_data
+
+        X, y, _, _ = preprocess_data(sample_career_df, "career")
+        with pytest.raises(ValueError, match="does not support"):
+            train_model(X, y, "regression", "Logistic Regression")

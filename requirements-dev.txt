@@ -1,5 +1,11 @@
 # Development / testing dependencies (not installed in Docker production image)
--r requirements.txt
+# ---
+# Lightweight core deps for testable modules (NO PyTorch — saves ~800MB in CI)
+numpy>=2.4.0
+pandas>=2.3.0
+scikit-learn>=1.8.0
+# ---
+# Test + lint tooling
 pytest>=8.0.0
 pytest-cov>=6.0.0
 ruff>=0.11.0
