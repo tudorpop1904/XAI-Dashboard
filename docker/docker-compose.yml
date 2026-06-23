@@ -13,13 +13,7 @@ services:
     environment:
       - OLLAMA_HOST=http://ollama:11434
       - OLLAMA_MODEL=llama3.1:8b-instruct-q4_K_M
-      - VLM_MODEL=qwen2.5vl:7b-q4_K_M
-      - VLM_HOST=http://ollama:11434
-      - XAI_SURROGATE_MODEL=minicpm-v
-      # Set REMOTE_VLM_HOST to offload VLM to external hardware (e.g. Pi 4)
-      # - REMOTE_VLM_HOST=http://<external-ip>:11434
-      - KAGGLE_USERNAME=${KAGGLE_USERNAME}
-      - KAGGLE_API_TOKEN=${KAGGLE_API_TOKEN}
+      - DEPLOYMENT_ENV=local
     depends_on:
       - ollama
     restart: unless-stopped

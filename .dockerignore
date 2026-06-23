@@ -3,13 +3,10 @@ __pycache__/
 */__pycache__/
 .ruff_cache/
 .pytest_cache/
-.vscode/
-.kaggle/
-.coverage
-.gitattributes
 *.pyc
 .git/
 .gitignore
+data_cache/
 models/
 *.egg-info/
 .env
@@ -22,4 +19,4 @@ models/
 tests/
 docs/
 Jenkinsfile
-demo/
+requirements-dev.txt

@@ -6,8 +6,8 @@ the LLM response token-by-token for Streamlit's st.write_stream.
 """
 
 import os
-
 import ollama
+
 
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1:8b-instruct-q4_K_M")
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
@@ -62,7 +62,8 @@ def build_explanation_prompt(
         )
     if "LIME" in xai_methods:
         method_descs.append(
-            "  • LIME — similar idea but uses a local surrogate model, so values may vary between runs."
+            "  • LIME — similar idea but uses a local surrogate model, so values "
+            "may vary between runs."
         )
 
     num_runs = len(explanation_runs)
@@ -78,12 +79,18 @@ def build_explanation_prompt(
         if "shap_df" in run and run["shap_df"] is not None:
             parts.append(f"SHAP base value: {run['shap_base_value']:.6f}")
             shap_top = run["shap_df"].head(10)
-            shap_lines = [f"  {row['feature']}: shap={row['shap_value']:.6f}" for _, row in shap_top.iterrows()]
+            shap_lines = [
+                f"  {row['feature']}: shap={row['shap_value']:.6f}"
+                for _, row in shap_top.iterrows()
+            ]
             parts.append("Top SHAP contributions:\n" + "\n".join(shap_lines))
 
         if "lime_df" in run and run["lime_df"] is not None:
             lime_top = run["lime_df"].head(10)
-            lime_lines = [f"  {row['feature']}: weight={row['lime_weight']:.6f}" for _, row in lime_top.iterrows()]
+            lime_lines = [
+                f"  {row['feature']}: weight={row['lime_weight']:.6f}"
+                for _, row in lime_top.iterrows()
+            ]
             parts.append("Top LIME contributions:\n" + "\n".join(lime_lines))
 
         parts.append("")
@@ -134,7 +141,9 @@ def check_ollama_available():
         models = _client.list()
         model_names = [m.model for m in models.models]
 
-        matches = [n for n in model_names if n.startswith(OLLAMA_MODEL.split(":")[0])]
+        matches = [
+            n for n in model_names if n.startswith(OLLAMA_MODEL.split(":")[0])
+        ]
 
         if matches:
             return True, f"Ollama is running. Model `{matches[0]}` found and ready."
@@ -166,7 +175,11 @@ def build_viz_counselor_prompt(
     """
     Prompt for the Visualization XAI track (Grad-CAM + saliency on handwriting).
     """
-    ratio = skill_marked_correct / skill_attempts if skill_attempts > 0 else None
+    ratio = (
+        skill_marked_correct / skill_attempts
+        if skill_attempts > 0
+        else None
+    )
     corr = user_correction.strip() if user_correction else None
     parts = [
         "You are a supportive math tutor and learning coach (like a friendly "
@@ -179,7 +192,9 @@ def build_viz_counselor_prompt(
         "without claiming you saw the exact image pixels.\n",
     ]
     if val_accuracy is not None:
-        parts.append(f"Model validation accuracy (held-out synthetic set): {val_accuracy:.1%}\n")
+        parts.append(
+            f"Model validation accuracy (held-out synthetic set): {val_accuracy:.1%}\n"
+        )
     parts.extend(
         [
             f"Predicted expression: {expression}\n",
@@ -195,7 +210,8 @@ def build_viz_counselor_prompt(
             "how to verify by hand.\n"
         )
     parts.append(
-        f"Self-reported practice so far: {skill_marked_correct} marked-correct out of {skill_attempts} attempts.\n"
+        f"Self-reported practice so far: {skill_marked_correct} marked-correct out of "
+        f"{skill_attempts} attempts.\n"
     )
     if ratio is not None:
         parts.append(

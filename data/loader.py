@@ -3,9 +3,9 @@ loader.py — Kaggle dataset download and CSV loading.
 """
 
 import os
-
 import kagglehub
 import pandas as pd
+
 
 CACHE_DIR = "data_cache"
 
@@ -27,7 +27,10 @@ def download_dataset(dataset_slug):
             errors.append(f"{slug}: {exc.__class__.__name__}: {exc}")
 
     error_details = "\n".join(errors)
-    raise RuntimeError(f"All dataset download attempts failed.\nTried {len(slugs)} slug(s):\n{error_details}")
+    raise RuntimeError(
+        "All dataset download attempts failed.\n"
+        f"Tried {len(slugs)} slug(s):\n{error_details}"
+    )
 
 
 def load_csv_from_dataset(dataset_path):

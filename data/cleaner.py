@@ -5,6 +5,8 @@ Drops empty, ID-like, and unique-integer columns;
 fills missing values with medians (numeric) or modes (categorical).
 """
 
+import pandas as pd
+
 
 def clean_dataset(df, schema):
     """

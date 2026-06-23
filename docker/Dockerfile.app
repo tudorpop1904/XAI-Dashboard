@@ -36,7 +36,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY app.py .
 
 COPY core/ core/
-COPY data/ data/
 COPY pages/ pages/
 COPY ui/ ui/
 

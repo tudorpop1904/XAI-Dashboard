@@ -15,11 +15,10 @@ import hashlib
 import json
 import pathlib
 import pickle
-from typing import Any
+from typing import Any, Dict, Optional
 
 CACHE_DIR = pathlib.Path("data_cache/llm_responses")
 MODEL_DIR = pathlib.Path("data_cache/models")
-
 
 # Create a hash of the request (model + messages + extra)
 def _make_key(model: str, messages: list, **extra) -> str:
@@ -31,9 +30,8 @@ def _make_key(model: str, messages: list, **extra) -> str:
     )
     return hashlib.sha256(payload.encode()).hexdigest()
 
-
 # Get cached response
-def get_cached(model: str, messages: list, **extra) -> dict[str, Any] | None:
+def get_cached(model: str, messages: list, **extra) -> Optional[Dict[str, Any]]:
     """Return cached response dict, or None if not cached."""
     key = _make_key(model, messages, **extra)
     path = CACHE_DIR / f"{key}.json"
@@ -44,9 +42,8 @@ def get_cached(model: str, messages: list, **extra) -> dict[str, Any] | None:
             return None
     return None
 
-
 # Store a response in the cache
-def put_cached(model: str, messages: list, response: dict[str, Any], **extra) -> None:
+def put_cached(model: str, messages: list, response: Dict[str, Any], **extra) -> None:
     """Store a response in the cache."""
     key = _make_key(model, messages, **extra)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -56,9 +53,8 @@ def put_cached(model: str, messages: list, response: dict[str, Any], **extra) ->
     except OSError:
         pass  # Non-critical — silently skip if write fails
 
-
 # Wrapper around client.chat() with transparent file-based caching
-def cached_chat(client, model: str, messages: list, **kwargs) -> dict[str, Any]:
+def cached_chat(client, model: str, messages: list, **kwargs) -> Dict[str, Any]:
     """
     Wrapper around client.chat() with transparent file-based caching.
 
@@ -74,7 +70,6 @@ def cached_chat(client, model: str, messages: list, **kwargs) -> dict[str, Any]:
     put_cached(model, messages, response)
     return response
 
-
 # Delete all cached responses
 def clear_cache() -> int:
     """Delete all cached responses. Returns count of files removed."""
@@ -85,7 +80,6 @@ def clear_cache() -> int:
         f.unlink(missing_ok=True)
     return len(files)
 
-
 # Cache Trained Model
 def save_trained_model(model, name: str) -> None:
     """Serialize and save the trained model to a pickle file."""
@@ -93,7 +87,6 @@ def save_trained_model(model, name: str) -> None:
     path = MODEL_DIR / f"{name}.pkl"
     with open(path, "wb") as f:
         pickle.dump(model, f)
-
 
 # Load Cached Model
 def load_trained_model(name: str):

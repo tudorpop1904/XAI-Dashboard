@@ -19,15 +19,15 @@ import base64
 import io
 import os
 import time
-from collections.abc import Generator
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Generator, List, Optional, Tuple
 
-import numpy as np
 import ollama
 from PIL import Image
 
 from core.cache import cached_chat
+
 
 # ─────────────────────────────────────────────
 # Configuration
@@ -70,7 +70,6 @@ def _get_eval_client() -> ollama.Client:
 # Data structures
 # ─────────────────────────────────────────────
 
-
 class Verdict(Enum):
     CORRECT = "correct"
     INCORRECT = "incorrect"
@@ -81,9 +80,8 @@ class Verdict(Enum):
 @dataclass
 class TranscriptionResult:
     """Result of reading one or more pages of handwritten math."""
-
-    latex: str  # Full LaTeX transcription
-    raw_text: str  # Raw model output before cleanup
+    latex: str                         # Full LaTeX transcription
+    raw_text: str                      # Raw model output before cleanup
     page_count: int = 1
     elapsed_seconds: float = 0.0
 
@@ -91,20 +89,18 @@ class TranscriptionResult:
 @dataclass
 class EvaluationResult:
     """Result of evaluating the mathematical reasoning."""
-
     verdict: Verdict
-    summary: str  # One-paragraph plain-English summary
-    step_by_step: str  # Detailed step-by-step analysis
-    errors: list[str] = field(default_factory=list)  # Specific errors found
-    corrected_latex: str = ""  # Corrected version (if errors exist)
-    practice_problems: str = ""  # Suggested practice problems
+    summary: str                       # One-paragraph plain-English summary
+    step_by_step: str                  # Detailed step-by-step analysis
+    errors: List[str] = field(default_factory=list)  # Specific errors found
+    corrected_latex: str = ""          # Corrected version (if errors exist)
+    practice_problems: str = ""        # Suggested practice problems
     elapsed_seconds: float = 0.0
 
 
 # ─────────────────────────────────────────────
 # Image helpers
 # ─────────────────────────────────────────────
-
 
 def pil_to_bytes(img: Image.Image, fmt: str = "PNG") -> bytes:
     """Convert a PIL image to raw bytes for the Ollama API."""
@@ -119,11 +115,11 @@ def pil_to_base64(img: Image.Image, fmt: str = "PNG") -> str:
 
 
 def _prepare_images(
-    images: list[Image.Image],
+    images: List[Image.Image],
     max_dim: int = 1536,
-) -> list[bytes]:
+) -> List[bytes]:
     """Prepare a list of PIL images as byte blobs for Ollama."""
-    prepared: list[bytes] = []
+    prepared: List[bytes] = []
     for img in images:
         w, h = img.size
         if max(w, h) > max_dim:
@@ -213,8 +209,7 @@ def _build_evaluation_prompt(latex: str) -> str:
 # VLM health checks
 # ─────────────────────────────────────────────
 
-
-def check_vlm_available() -> tuple[bool, str]:
+def check_vlm_available() -> Tuple[bool, str]:
     """
     Check whether the VLM model is available on Ollama.
 
@@ -232,12 +227,15 @@ def check_vlm_available() -> tuple[bool, str]:
         if matches:
             return True, f"VLM ready: `{matches[0]}` on `{REMOTE_VLM_HOST or VLM_HOST}`"
         else:
-            return False, (f"VLM model `{VLM_MODEL}` not found. Pull it with: `ollama pull {VLM_MODEL}`")
+            return False, (
+                f"VLM model `{VLM_MODEL}` not found. "
+                f"Pull it with: `ollama pull {VLM_MODEL}`"
+            )
     except Exception as e:
         return False, f"Cannot reach VLM backend: {e}"
 
 
-def check_eval_available() -> tuple[bool, str]:
+def check_eval_available() -> Tuple[bool, str]:
     """Check whether the text evaluation LLM is available."""
     try:
         client = _get_eval_client()
@@ -248,7 +246,10 @@ def check_eval_available() -> tuple[bool, str]:
         if matches:
             return True, f"Eval LLM ready: `{matches[0]}`"
         else:
-            return False, (f"Eval model `{EVAL_MODEL}` not found. Pull it with: `ollama pull {EVAL_MODEL}`")
+            return False, (
+                f"Eval model `{EVAL_MODEL}` not found. "
+                f"Pull it with: `ollama pull {EVAL_MODEL}`"
+            )
     except Exception as e:
         return False, f"Cannot reach eval LLM: {e}"
 
@@ -257,8 +258,7 @@ def check_eval_available() -> tuple[bool, str]:
 # Core pipeline functions
 # ─────────────────────────────────────────────
 
-
-def transcribe_images(images: list[Image.Image]) -> TranscriptionResult:
+def transcribe_images(images: List[Image.Image]) -> TranscriptionResult:
     """
     Send one or more images to the VLM and get a LaTeX transcription.
 
@@ -301,7 +301,7 @@ def transcribe_images(images: list[Image.Image]) -> TranscriptionResult:
 
 
 def transcribe_images_stream(
-    images: list[Image.Image],
+    images: List[Image.Image],
 ) -> Generator[str, None, TranscriptionResult]:
     """
     Streaming variant — yields token chunks as they arrive.
@@ -425,7 +425,7 @@ def _parse_evaluation(raw: str, elapsed: float) -> EvaluationResult:
         "practice": "practice",
     }
 
-    current_key: str | None = None
+    current_key: Optional[str] = None
     for line in raw.split("\n"):
         stripped = line.strip().lstrip("#").strip()
         lower = stripped.lower()
@@ -434,7 +434,7 @@ def _parse_evaluation(raw: str, elapsed: float) -> EvaluationResult:
             if lower.startswith(header):
                 current_key = key
                 # Capture any inline content after the header
-                rest = stripped[len(header) :].strip().lstrip(":").strip()
+                rest = stripped[len(header):].strip().lstrip(":").strip()
                 if rest:
                     sections[current_key] = rest + "\n"
                 matched = True
@@ -451,7 +451,7 @@ def _parse_evaluation(raw: str, elapsed: float) -> EvaluationResult:
             break
 
     # Parse errors list
-    error_lines: list[str] = []
+    error_lines: List[str] = []
     for line in sections["errors"].strip().split("\n"):
         line = line.strip().lstrip("-•*").strip()
         if line and line.lower() != "none" and line.lower() != "n/a":
@@ -468,21 +468,23 @@ def _parse_evaluation(raw: str, elapsed: float) -> EvaluationResult:
     )
 
 
+# ─────────────────────────────────────────────
 # Occlusion Sensitivity XAI
 # ─────────────────────────────────────────────
+
+import numpy as np
 
 
 @dataclass
 class OcclusionResult:
     """Result of occlusion sensitivity analysis."""
-
-    heatmap: np.ndarray  # (H, W) float in [0, 1]
+    heatmap: np.ndarray             # (H, W) float in [0, 1]
     grid_rows: int
     grid_cols: int
-    baseline_text: str  # Transcription of the unoccluded image
-    cell_texts: list[str]  # Transcription per occluded cell
-    cell_similarities: list[float]  # Similarity score per cell (1 = identical)
-    surrogate_model: str  # Which model was used for probing
+    baseline_text: str              # Transcription of the unoccluded image
+    cell_texts: List[str]           # Transcription per occluded cell
+    cell_similarities: List[float]  # Similarity score per cell (1 = identical)
+    surrogate_model: str            # Which model was used for probing
     elapsed_seconds: float = 0.0
 
 
@@ -526,14 +528,13 @@ def _occlude_region(
     y1 = y0 + cell_h if row < grid_rows - 1 else h
     occluded = img.copy()
     from PIL import ImageDraw as _IDraw
-
     draw = _IDraw.Draw(occluded)
     draw.rectangle([x0, y0, x1, y1], fill=fill)
     return occluded
 
 
 def _transcribe_for_xai(
-    images: list[Image.Image],
+    images: List[Image.Image],
     model: str,
 ) -> str:
     """
@@ -568,7 +569,7 @@ def _transcribe_for_xai(
         return ""
 
 
-def check_surrogate_available() -> tuple[bool, str]:
+def check_surrogate_available() -> Tuple[bool, str]:
     """Check whether the XAI surrogate model is available."""
     try:
         client = _get_vlm_client()
@@ -589,7 +590,7 @@ def check_surrogate_available() -> tuple[bool, str]:
 
 
 def occlusion_sensitivity(
-    images: list[Image.Image],
+    images: List[Image.Image],
     baseline_text: str,
     grid_rows: int = 3,
     grid_cols: int = 3,
@@ -636,8 +637,8 @@ def occlusion_sensitivity(
     else:
         surrogate_baseline = baseline_text
 
-    cell_texts: list[str] = []
-    cell_sims: list[float] = []
+    cell_texts: List[str] = []
+    cell_sims: List[float] = []
 
     t0 = time.time()
 
@@ -672,7 +673,6 @@ def occlusion_sensitivity(
     # Upscale to image dimensions for overlay
     w, h = img0.size
     from PIL import Image as _PILImage
-
     heatmap_pil = _PILImage.fromarray((importance * 255).astype(np.uint8), mode="L")
     heatmap_pil = heatmap_pil.resize((w, h), _PILImage.BILINEAR)
     heatmap = np.asarray(heatmap_pil, dtype=np.float32) / 255.0
