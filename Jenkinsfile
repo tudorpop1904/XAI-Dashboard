@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh '''
                     python3 -m venv ${VENV_PATH}
-                    source ${VENV_PATH}/bin/activate
+                    . ${VENV_PATH}/bin/activate
                     pip install --upgrade pip
                     
                     pip install -r requirements.txt
@@ -34,7 +34,7 @@ pipeline {
         stage('Lint') {
             steps {
                 sh '''
-                    source ${VENV_PATH}/bin/activate
+                    . ${VENV_PATH}/bin/activate
                     ruff check . --output-format=github
                 '''
             }
@@ -44,7 +44,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 sh '''
-                    source ${VENV_PATH}/bin/activate
+                    . ${VENV_PATH}/bin/activate
                     pytest tests/unit/ -v --tb=short --junitxml=test-results.xml
                 '''
             }
