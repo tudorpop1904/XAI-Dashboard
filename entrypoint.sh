@@ -47,17 +47,6 @@ echo "Pulling LLM model (llama3.1:8b-instruct-q4_K_M)..."
 ensure_model llama3.1:8b-instruct-q4_K_M
 echo "✓ llama3.1:8b-instruct-q4_K_M ready"
 
-echo ""
-echo "Pulling VLM model (qwen2.5vl:7b-q4_K_M)..."
-ensure_model qwen2.5vl:7b-q4_K_M
-echo "✓ qwen2.5vl:7b-q4_K_M ready"
-
-echo ""
-echo "Pulling XAI surrogate model (minicpm-v)..."
-ensure_model minicpm-v
-echo "✓ minicpm-v ready"
-
-
 # Ready banner
 echo ""
 echo "=========================================="
