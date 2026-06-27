@@ -106,12 +106,6 @@ pipeline {
 
         /* ---------------- LOCAL DEPLOY ---------------- */
         stage('Deploy (Local)') {
-            when {
-                anyOf {
-                    branch 'main'
-                    expression { return env.BUILD_NUMBER == '1' }
-                }
-            }
 
             steps {
                 sh '''
@@ -123,10 +117,7 @@ pipeline {
         /* ------------ CLOUD DEPLOY (Microsoft Azure) ------------ */
         stage('Deploy (Cloud)') {
             when {
-                anyOf {
-                    branch 'main'
-                    expression { return env.BUILD_NUMBER == '1' }
-                }
+                branch 'main'
             }
 
             steps {
