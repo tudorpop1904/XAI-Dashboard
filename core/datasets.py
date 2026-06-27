@@ -7,7 +7,6 @@ real and AI-generated images.
 
 from __future__ import annotations
 
-import os
 import random
 from pathlib import Path
 
@@ -16,7 +15,7 @@ import numpy as np
 import torch
 from PIL import Image
 
-from core.fake_data import FakeImageBundle, LABEL_REAL, LABEL_AI
+from core.fake_data import LABEL_AI, LABEL_REAL, FakeImageBundle
 
 DATASETS = {
     "CIFAKE (CIFAR-10 scale)": "birdy654/cifake-real-and-ai-generated-synthetic-images",
@@ -70,7 +69,7 @@ def load_image_folder(
     base_dir = Path(path)
 
     all_images = _find_images(base_dir, {"real": LABEL_REAL, "ai": LABEL_AI, "fake": LABEL_AI})
-    
+
     # Separate into classes
     reals = [p for p in all_images if p[1] == LABEL_REAL]
     fakes = [p for p in all_images if p[1] == LABEL_AI]

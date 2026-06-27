@@ -103,6 +103,7 @@ def load_trained_model(name: str):
         with open(path, "rb") as f:
             return pickle.load(f)
 
+
 def save_model_cache(name: str, state_bytes: bytes) -> None:
     """Persist model state_dict bytes to disk."""
     MODEL_DIR.mkdir(parents=True, exist_ok=True)

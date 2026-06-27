@@ -148,6 +148,7 @@ if st.session_state.get("xai_results"):
     st.subheader("Forensic feature visualization")
     features = st.session_state.get("detector_features", {})
     from core.image_features import fft_channel, lbp_channel, magnitude_channel
+
     x_tensor = st.session_state["input_tensor"]
     fc1, fc2, fc3 = st.columns(3)
     if features.get("add_fft", True):

@@ -325,19 +325,13 @@ def run_method(
     _, _, h, w = x_tensor.shape
     if method == "Occlusion":
         return _measure_blackbox(
-            lambda: occlusion_sensitivity(
-                model, x_tensor, target_class, grid_rows, grid_cols, device
-            )
+            lambda: occlusion_sensitivity(model, x_tensor, target_class, grid_rows, grid_cols, device)
         )
     if method == "Visual PMI":
-        return _measure_blackbox(
-            lambda: visual_pmi(model, x_tensor, target_class, grid_rows, grid_cols, device)
-        )
+        return _measure_blackbox(lambda: visual_pmi(model, x_tensor, target_class, grid_rows, grid_cols, device))
     if method == "Visual Sobol":
         return _measure_blackbox(
-            lambda: visual_sobol(
-                model, x_tensor, target_class, grid_rows, grid_cols, n_sobol_samples, device
-            )
+            lambda: visual_sobol(model, x_tensor, target_class, grid_rows, grid_cols, n_sobol_samples, device)
         )
     if method == "Grad-CAM":
         return run_grad_cam(model, x_tensor, target_class, (h, w), device)

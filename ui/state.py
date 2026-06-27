@@ -27,8 +27,9 @@ def init_state():
         if key not in st.session_state:
             st.session_state[key] = value
 
+
 def reset_analysis():
-    for k in(
+    for k in (
         "uploaded_image",
         "uploaded_image_name",
         "input_tensor",
@@ -54,6 +55,7 @@ def require(key, message="Please complete the previous step first."):
         if st.button("🏠 Home"):
             st.switch_page("pages/1_home.py")
         st.stop()
+
 
 def nav_buttons(back_page=None):
     cols = st.columns([1, 1, 8])

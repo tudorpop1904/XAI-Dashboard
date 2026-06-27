@@ -10,5 +10,6 @@ def test_list_datasets():
     assert "CIFAKE (CIFAR-10 scale)" in datasets
     assert "birdy654/cifake-real-and-ai-generated-synthetic-images" in datasets.values()
 
+
 # Note: testing download_dataset and load_image_folder would require
 # mocking kagglehub and file system. For simplicity in CI, we just test the registry.

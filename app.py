@@ -2,15 +2,14 @@
 app.py — AI Image Forensics XAI Playground entrypoint.
 """
 
-from dotenv import load_dotenv
-
-# Load .env for local (non-Docker) runs — sets KAGGLE_USERNAME, KAGGLE_KEY, etc.
-load_dotenv()
-
 import streamlit as st
+from dotenv import load_dotenv
 
 from core.llm import check_ollama_available
 from ui.state import init_state
+
+# Load .env for local (non-Docker) runs — sets KAGGLE_USERNAME, KAGGLE_KEY, etc.
+load_dotenv()
 
 # ---- Page-level config (must be first Streamlit call) ----
 st.set_page_config(
@@ -39,6 +38,7 @@ def poll_ollama():
             st.rerun()
     except Exception:
         pass
+
 
 if not st.session_state["llm_ready"]:
     with st.sidebar:

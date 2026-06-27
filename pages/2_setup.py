@@ -3,8 +3,8 @@
 import streamlit as st
 import torch
 
-from core.cache import save_model_cache, load_model_cache
-from core.datasets import list_datasets, download_dataset, load_image_folder
+from core.cache import load_model_cache, save_model_cache
+from core.datasets import download_dataset, list_datasets, load_image_folder
 from core.fake_data import CLASS_NAMES, generate_synthetic_bundle
 from core.fake_detector import model_state_bytes, train_detector
 from ui.state import init_state, nav_buttons, reset_detector
@@ -63,8 +63,7 @@ with c1:
                     st.stop()
 
             model, acc, history = train_detector(
-                bundle, epochs=epochs, device=device,
-                add_fft=add_fft, add_lbp=add_lbp, add_magnitude=add_magnitude
+                bundle, epochs=epochs, device=device, add_fft=add_fft, add_lbp=add_lbp, add_magnitude=add_magnitude
             )
             state = model_state_bytes(model)
             st.session_state["detector_model_state"] = state

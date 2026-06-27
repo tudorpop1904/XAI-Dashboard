@@ -17,9 +17,7 @@ def overlay_heatmap(
     alpha: float = 0.45,
 ) -> Image.Image:
     """Blend heatmap onto RGB image."""
-    rgb = base_image.convert("RGB").resize(
-        (heatmap.shape[1], heatmap.shape[0]), Image.BICUBIC
-    )
+    rgb = base_image.convert("RGB").resize((heatmap.shape[1], heatmap.shape[0]), Image.BICUBIC)
     base = np.asarray(rgb, dtype=np.float32) / 255.0
     colored = plt.get_cmap(cmap)(heatmap)[..., :3]
     blended = np.clip(base * (1 - alpha) + colored * alpha, 0, 1)

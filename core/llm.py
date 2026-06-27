@@ -3,8 +3,8 @@ llm.py — Ollama LLM integration for forensic XAI narrative reports.
 """
 
 import os
-import ollama
 
+import ollama
 
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1:8b-instruct-q4_K_M")
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
@@ -23,6 +23,7 @@ def check_ollama_available() -> tuple[bool, str]:
         return False, f"Model `{OLLAMA_MODEL}` not found. Run: ollama pull {OLLAMA_MODEL}"
     except Exception as e:
         return False, f"Cannot reach Ollama at {OLLAMA_HOST}: {e}"
+
 
 def build_forensic_prompt(
     detection_label: str,
@@ -47,7 +48,6 @@ def build_forensic_prompt(
             f"runtime {row['elapsed_s']}s, peak RAM {row['peak_memory_mb']} MB, "
             f"forward passes {row['forward_passes']}, "
             f"stability {row.get('stability', 'N/A')}.\n"
-
         )
     parts.append(
         "\nWrite a concise report (3–5 paragraphs) covering:\n"
@@ -61,6 +61,7 @@ def build_forensic_prompt(
         "Do not invent numeric heatmap values — refer only to the metrics provided.\n"
     )
     return "".join(parts)
+
 
 def stream_explanation(prompt: str):
     """Stream tokens from Ollama for st.write_stream."""

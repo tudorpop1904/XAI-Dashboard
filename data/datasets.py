@@ -8,9 +8,9 @@ can automatically try the next slug in the list.
 
 DATASETS = {
     "CIFAKE": [
-        "birdy654/cifake-real-and-ai-generated-synthetic-images/data",  
+        "birdy654/cifake-real-and-ai-generated-synthetic-images/data",
     ],
     "Fallback Dataset": [
         "tristanzhang32/ai-generated-images-vs-real-images",
-    ]
+    ],
 }

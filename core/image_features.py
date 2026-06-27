@@ -54,11 +54,7 @@ def fft_channel(img: torch.Tensor) -> torch.Tensor:
     magnitude -= magnitude.min()
     magnitude /= magnitude.max() + 1e-8
 
-    return torch.tensor(
-        magnitude,
-        dtype=img.dtype,
-        device=img.device
-    ).unsqueeze(0)
+    return torch.tensor(magnitude, dtype=img.dtype, device=img.device).unsqueeze(0)
 
 
 def magnitude_channel(img: torch.Tensor) -> torch.Tensor:
@@ -69,28 +65,20 @@ def magnitude_channel(img: torch.Tensor) -> torch.Tensor:
         [1,H,W]
     """
     gray = _tensor_to_gray_np(img)
-    
+
     grad_x = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
     grad_y = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
-    
+
     magnitude = cv2.magnitude(grad_x, grad_y)
-    
+
     # normalize
     magnitude -= magnitude.min()
     magnitude /= magnitude.max() + 1e-8
-    
-    return torch.tensor(
-        magnitude,
-        dtype=img.dtype,
-        device=img.device
-    ).unsqueeze(0)
+
+    return torch.tensor(magnitude, dtype=img.dtype, device=img.device).unsqueeze(0)
 
 
-def lbp_channel(
-    img: torch.Tensor,
-    radius: int = 1,
-    points: int = 8
-) -> torch.Tensor:
+def lbp_channel(img: torch.Tensor, radius: int = 1, points: int = 8) -> torch.Tensor:
     """
     Local Binary Pattern texture channel.
 
@@ -100,18 +88,9 @@ def lbp_channel(
 
     gray = _tensor_to_gray_np(img)
 
-    lbp = local_binary_pattern(
-        gray,
-        points,
-        radius,
-        method="uniform"
-    )
+    lbp = local_binary_pattern(gray, points, radius, method="uniform")
 
     lbp -= lbp.min()
     lbp /= lbp.max() + 1e-8
 
-    return torch.tensor(
-        lbp,
-        dtype=img.dtype,
-        device=img.device
-    ).unsqueeze(0)
+    return torch.tensor(lbp, dtype=img.dtype, device=img.device).unsqueeze(0)

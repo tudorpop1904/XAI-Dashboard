@@ -7,8 +7,6 @@ Production deployments would fine-tune on CiFAKE or similar forensic datasets.
 
 from __future__ import annotations
 
-from core.image_features import fft_channel, lbp_channel
-
 import random
 from dataclasses import dataclass
 
@@ -16,6 +14,7 @@ import numpy as np
 import torch
 from PIL import Image, ImageDraw, ImageFilter
 
+from core.image_features import fft_channel, lbp_channel
 
 CLASS_NAMES = ("Real", "AI-Generated")
 LABEL_REAL = 0
@@ -136,28 +135,15 @@ def generate_synthetic_bundle(
         lbp_features = []
 
         for img in imgs:
-
             if use_fft:
-                fft_features.append(
-                    fft_channel(img)
-                )
+                fft_features.append(fft_channel(img))
 
             if use_lbp:
-                lbp_features.append(
-                    lbp_channel(img)
-                )
+                lbp_features.append(lbp_channel(img))
 
-        fft_tensor = (
-            torch.stack(fft_features)
-            if use_fft
-            else None
-        )
+        fft_tensor = torch.stack(fft_features) if use_fft else None
 
-        lbp_tensor = (
-            torch.stack(lbp_features)
-            if use_lbp
-            else None
-        )
+        lbp_tensor = torch.stack(lbp_features) if use_lbp else None
 
         return fft_tensor, lbp_tensor
 
@@ -166,30 +152,18 @@ def generate_synthetic_bundle(
     train_y = torch.tensor(labels[:split], dtype=torch.long)
     val_y = torch.tensor(labels[split:], dtype=torch.long)
 
-    train_fft, train_lbp = compute_features(
-        train_x,
-        use_fft=True,
-        use_lbp=True
-    )
+    train_fft, train_lbp = compute_features(train_x, use_fft=True, use_lbp=True)
 
-    val_fft, val_lbp = compute_features(
-        val_x,
-        use_fft=True,
-        use_lbp=True
-    )
+    val_fft, val_lbp = compute_features(val_x, use_fft=True, use_lbp=True)
 
     return FakeImageBundle(
         img_size=img_size,
-
         train_images=train_x,
         train_labels=train_y,
-
         val_images=val_x,
         val_labels=val_y,
-
         train_fft=train_fft,
         train_lbp=train_lbp,
-
         val_fft=val_fft,
         val_lbp=val_lbp,
     )

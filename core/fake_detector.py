@@ -4,12 +4,11 @@ fake_detector.py — Binary CNN classifier: Real vs AI-generated images.
 Provides training, inference, Grad-CAM and input saliency (white-box baselines
 for comparison with black-box perturbation methods).
 """
+
 from __future__ import annotations
 
 import io
 from dataclasses import dataclass
-
-from core.image_features import fft_channel, lbp_channel, magnitude_channel
 
 import numpy as np
 import torch
@@ -18,6 +17,7 @@ import torch.nn.functional as F
 from PIL import Image
 
 from core.fake_data import CLASS_NAMES, FakeImageBundle
+from core.image_features import fft_channel, lbp_channel, magnitude_channel
 
 
 @dataclass
@@ -69,31 +69,27 @@ class FakeDetectorCNN(nn.Module):
         else:
             self.feature_adapter = None
 
-
         self.block = nn.Sequential(
             nn.Conv2d(3, 32, kernel_size=3, padding=1),
             nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
-
             nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
-
             nn.Conv2d(64, 128, kernel_size=3, padding=1),
             nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
-
-            nn.Conv2d(128,128,kernel_size=3,padding=1),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1),
             nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
         )
 
-        self.gap = nn.AdaptiveAvgPool2d((4,4))
+        self.gap = nn.AdaptiveAvgPool2d((4, 4))
         self.dropout = nn.Dropout(0.25)
-        self.fc = nn.Linear(128*4*4,num_classes)
+        self.fc = nn.Linear(128 * 4 * 4, num_classes)
 
     def add_forensic_channels(
         self,
@@ -103,38 +99,25 @@ class FakeDetectorCNN(nn.Module):
         if self.feature_adapter is None:
             return x
 
-        channels = [x]
-
         extras = []
 
         for img in x:
             feats = []
 
             if self.add_fft:
-                feats.append(
-                    fft_channel(img)
-                )
+                feats.append(fft_channel(img))
 
             if self.add_lbp:
-                feats.append(
-                    lbp_channel(img)
-                )
+                feats.append(lbp_channel(img))
 
             if self.add_magnitude:
-                feats.append(
-                    magnitude_channel(img)
-                )
+                feats.append(magnitude_channel(img))
 
-            extras.append(
-                torch.cat(feats, dim=0)
-            )
+            extras.append(torch.cat(feats, dim=0))
 
         extras = torch.stack(extras)
 
-        x = torch.cat(
-            [x, extras],
-            dim=1
-        )
+        x = torch.cat([x, extras], dim=1)
 
         return self.feature_adapter(x)
 
@@ -153,11 +136,7 @@ class FakeDetectorCNN(nn.Module):
 
         pooled = self.gap(conv_out)
 
-        logits = self.fc(
-            self.dropout(
-                pooled.flatten(1)
-            )
-        )
+        logits = self.fc(self.dropout(pooled.flatten(1)))
 
         return logits, conv_out
 

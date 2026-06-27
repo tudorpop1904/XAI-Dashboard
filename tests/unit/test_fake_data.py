@@ -11,7 +11,7 @@ def test_class_names():
 
 def test_bundle_shapes():
     pytest = __import__("pytest")
-    torch = pytest.importorskip("torch")
+    pytest.importorskip("torch")
     bundle = generate_synthetic_bundle(samples_per_class=20, img_size=64)
     assert bundle.train_images.shape[1:] == (3, 64, 64)
     assert bundle.val_images.shape[0] >= 2

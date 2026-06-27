@@ -3,11 +3,11 @@
 import numpy as np
 import pytest
 import torch
+from PIL import Image
 
 from core.fake_data import generate_synthetic_bundle
-from core.fake_detector import FakeDetectorCNN, grad_cam, pil_to_tensor, predict, train_detector
+from core.fake_detector import grad_cam, pil_to_tensor, predict, train_detector
 from core.image_xai import run_all_methods
-from PIL import Image
 
 
 @pytest.fixture

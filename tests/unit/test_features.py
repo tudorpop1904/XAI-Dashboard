@@ -1,23 +1,19 @@
 import torch
 
-from core.image_features import (
-    fft_channel,
-    lbp_channel,
-    magnitude_channel
-)
+from core.image_features import fft_channel, lbp_channel, magnitude_channel
 
 
 def test_features():
 
-    x = torch.rand(3,224,224)
+    x = torch.rand(3, 224, 224)
 
     fft = fft_channel(x)
     lbp = lbp_channel(x)
     mag = magnitude_channel(x)
 
-    assert fft.shape == (1,224,224)
-    assert lbp.shape == (1,224,224)
-    assert mag.shape == (1,224,224)
+    assert fft.shape == (1, 224, 224)
+    assert lbp.shape == (1, 224, 224)
+    assert mag.shape == (1, 224, 224)
 
     assert fft.min() >= 0
     assert fft.max() <= 1
