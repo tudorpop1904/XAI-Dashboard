@@ -60,19 +60,24 @@ pipeline {
 
             when {
                 anyOf {
-                    branch 'main'
-                    branch 'release/*'
-                }
-                expression {
-                    return filesChanged([
-                        "docker/**",
-                        "core/**",
-                        "pages/**",
-                        "ui/**",
-                        "requirements.txt",
-                        ".dockerignore",
-                        "Dockerfile*"
-                    ])
+                    expression { return env.BUILD_NUMBER == '1' }
+                    allOf {
+                        anyOf {
+                            branch 'main'
+                            branch 'release/*'
+                        }
+                        expression {
+                            return filesChanged([
+                                "docker/**",
+                                "core/**",
+                                "pages/**",
+                                "ui/**",
+                                "requirements.txt",
+                                ".dockerignore",
+                                "Dockerfile*"
+                            ])
+                        }
+                    }
                 }
             }
 
@@ -102,7 +107,10 @@ pipeline {
         /* ---------------- LOCAL DEPLOY ---------------- */
         stage('Deploy (Local)') {
             when {
-                branch 'main'
+                anyOf {
+                    branch 'main'
+                    expression { return env.BUILD_NUMBER == '1' }
+                }
             }
 
             steps {
@@ -115,7 +123,10 @@ pipeline {
         /* ------------ CLOUD DEPLOY (Microsoft Azure) ------------ */
         stage('Deploy (Cloud)') {
             when {
-                branch 'main'
+                anyOf {
+                    branch 'main'
+                    expression { return env.BUILD_NUMBER == '1' }
+                }
             }
 
             steps {
