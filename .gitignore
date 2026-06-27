@@ -7,3 +7,5 @@ __pycache__/
 .venv/
 .env
 *.png
+data_cache/
+demo/
