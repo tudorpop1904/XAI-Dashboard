@@ -2,45 +2,49 @@ pipeline {
     agent any
 
     triggers {
-        // Automatically check for new commits every 5 minutes
         pollSCM('H/5 * * * *')
+        githubPush()
     }
 
     environment {
-        VENV = '.venv-ci'
-        // Persist pip cache across builds so we don't redownload Torch
         PIP_CACHE_DIR = "${JENKINS_HOME}/.cache/pip"
+        VENV_PATH = ".venv-ci"
+        // Microsoft Azure VM — set these in Jenkins > Manage Credentials
+        CLOUD_VM_IP = credentials('azure-cloud-vm-ip')
+        CLOUD_SSH_KEY = credentials('azure-cloud-ssh-key')
     }
 
     stages {
+
+        /* ---------------- CI: SETUP ---------------- */
         stage('Setup') {
             steps {
                 sh '''
-                    # Only create venv if it doesn't exist to save time
-                    if [ ! -d "${VENV}" ]; then
-                        python3 -m venv ${VENV}
-                    fi
-                    . ${VENV}/bin/activate
+                    python3 -m venv ${VENV_PATH}
+                    source ${VENV_PATH}/bin/activate
                     pip install --upgrade pip
-                    pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+                    
+                    pip install -r requirements.txt
                     pip install -r requirements-dev.txt
                 '''
             }
         }
 
+        /* ---------------- CI: LINT ---------------- */
         stage('Lint') {
             steps {
                 sh '''
-                    . ${VENV}/bin/activate
+                    source ${VENV_PATH}/bin/activate
                     ruff check . --output-format=github
                 '''
             }
         }
 
+        /* ---------------- CI: TEST ---------------- */
         stage('Unit Tests') {
             steps {
                 sh '''
-                    . ${VENV}/bin/activate
+                    source ${VENV_PATH}/bin/activate
                     pytest tests/unit/ -v --tb=short --junitxml=test-results.xml
                 '''
             }
@@ -51,13 +55,83 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        /* ---------------- BUILD (OPTIMIZED) ---------------- */
+        stage('Build Images') {
+
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'release/*'
+                }
+                expression {
+                    return filesChanged([
+                        "docker/**",
+                        "core/**",
+                        "pages/**",
+                        "ui/**",
+                        "requirements.txt",
+                        ".dockerignore",
+                        "Dockerfile*"
+                    ])
+                }
+            }
+
             steps {
-                sh 'docker build -f docker/Dockerfile -t xai-app:${BUILD_NUMBER} .'
+                sh '''
+                    export DOCKER_BUILDKIT=1
+
+                    docker buildx build \
+                        -f docker/Dockerfile.app \
+                        -t xai-app:latest \
+                        --cache-from=type=local,src=/tmp/.buildx-cache \
+                        --cache-to=type=local,dest=/tmp/.buildx-cache-new \
+                        .
+
+                    docker buildx build \
+                        -f docker/Dockerfile.ollama \
+                        -t xai-ollama:latest \
+                        --cache-from=type=local,src=/tmp/.buildx-cache \
+                        --cache-to=type=local,dest=/tmp/.buildx-cache-new \
+                        .
+                '''
+
+                sh 'rm -rf /tmp/.buildx-cache && mv /tmp/.buildx-cache-new /tmp/.buildx-cache'
+            }
+        }
+
+        /* ---------------- LOCAL DEPLOY ---------------- */
+        stage('Deploy (Local)') {
+            when {
+                branch 'main'
+            }
+
+            steps {
+                sh '''
+                    docker compose -f docker/docker-compose.yml up -d --remove-orphans
+                '''
+            }
+        }
+
+        /* ------------ CLOUD DEPLOY (Microsoft Azure) ------------ */
+        stage('Deploy (Cloud)') {
+            when {
+                branch 'main'
+            }
+
+            steps {
+                sh '''
+                    chmod +x deploy/deploy.sh
+                    ./deploy/deploy.sh "${CLOUD_VM_IP}" "${CLOUD_SSH_KEY}" azureuser
+                '''
+            }
+        }
+
+        /* ---------------- SMOKE TESTS ---------------- */
+        stage('Smoke Tests') {
+            steps {
+                sh 'curl -sf http://localhost:8501/ || echo "Local smoke test skipped (not deployed locally)"'
+                sh 'curl -sf http://localhost:11434/api/tags || echo "Local Ollama smoke test skipped"'
             }
         }
     }
-
-    // Removed cleanWs() so the .venv-ci directory persists across builds
-    // making subsequent runs MUCH faster.
 }

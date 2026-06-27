@@ -9,7 +9,6 @@ __pycache__/
 data_cache/
 models/
 *.egg-info/
-.env
 .kaggle/
 .vscode/
 *.md

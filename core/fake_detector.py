@@ -4,11 +4,12 @@ fake_detector.py — Binary CNN classifier: Real vs AI-generated images.
 Provides training, inference, Grad-CAM and input saliency (white-box baselines
 for comparison with black-box perturbation methods).
 """
-
 from __future__ import annotations
 
 import io
 from dataclasses import dataclass
+
+from core.image_features import fft_channel, lbp_channel, magnitude_channel
 
 import numpy as np
 import torch
@@ -28,39 +29,136 @@ class DetectionResult:
 
 
 class FakeDetectorCNN(nn.Module):
-    """RGB CNN with spatial conv output for Grad-CAM."""
+    """
+    CNN detector with optional FFT/LBP forensic channels.
 
-    def __init__(self, num_classes: int = 2):
+    add_fft:
+        Adds FFT magnitude channel.
+
+    add_lbp:
+        Adds Local Binary Pattern texture channel.
+
+    The extra channels are projected back to RGB space through a
+    1x1 adapter convolution so Grad-CAM and saliency remain unchanged.
+    """
+
+    def __init__(
+        self,
+        num_classes: int = 2,
+        add_fft: bool = False,
+        add_lbp: bool = False,
+        add_magnitude: bool = False,
+    ):
         super().__init__()
+
+        self.add_fft = add_fft
+        self.add_lbp = add_lbp
+        self.add_magnitude = add_magnitude
+
+        extra = int(add_fft) + int(add_lbp) + int(add_magnitude)
+        self.input_channels = 3 + extra
+
+        # Project RGB + forensic channels back to RGB
+        if extra > 0:
+            self.feature_adapter = nn.Conv2d(
+                self.input_channels,
+                3,
+                kernel_size=1,
+                bias=False,
+            )
+        else:
+            self.feature_adapter = None
+
+
         self.block = nn.Sequential(
             nn.Conv2d(3, 32, kernel_size=3, padding=1),
             nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
+
             nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
+
             nn.Conv2d(64, 128, kernel_size=3, padding=1),
             nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
-            nn.Conv2d(128, 128, kernel_size=3, padding=1),
+
+            nn.Conv2d(128,128,kernel_size=3,padding=1),
             nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
         )
-        self.gap = nn.AdaptiveAvgPool2d((4, 4))
+
+        self.gap = nn.AdaptiveAvgPool2d((4,4))
         self.dropout = nn.Dropout(0.25)
-        self.fc = nn.Linear(128 * 4 * 4, num_classes)
+        self.fc = nn.Linear(128*4*4,num_classes)
+
+    def add_forensic_channels(
+        self,
+        x: torch.Tensor,
+    ) -> torch.Tensor:
+
+        if self.feature_adapter is None:
+            return x
+
+        channels = [x]
+
+        extras = []
+
+        for img in x:
+            feats = []
+
+            if self.add_fft:
+                feats.append(
+                    fft_channel(img)
+                )
+
+            if self.add_lbp:
+                feats.append(
+                    lbp_channel(img)
+                )
+
+            if self.add_magnitude:
+                feats.append(
+                    magnitude_channel(img)
+                )
+
+            extras.append(
+                torch.cat(feats, dim=0)
+            )
+
+        extras = torch.stack(extras)
+
+        x = torch.cat(
+            [x, extras],
+            dim=1
+        )
+
+        return self.feature_adapter(x)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         logits, _ = self.forward_with_conv(x)
         return logits
 
-    def forward_with_conv(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward_with_conv(
+        self,
+        x: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+
+        x = self.add_forensic_channels(x)
+
         conv_out = self.block(x)
+
         pooled = self.gap(conv_out)
-        logits = self.fc(self.dropout(pooled.flatten(1)))
+
+        logits = self.fc(
+            self.dropout(
+                pooled.flatten(1)
+            )
+        )
+
         return logits, conv_out
 
 
@@ -71,10 +169,18 @@ def train_detector(
     lr: float = 1e-3,
     device: str | torch.device = "cpu",
     seed: int = 42,
+    add_fft: bool = True,
+    add_lbp: bool = True,
+    add_magnitude: bool = True,
 ) -> tuple[FakeDetectorCNN, float, dict]:
     torch.manual_seed(seed)
     device = torch.device(device)
-    model = FakeDetectorCNN(len(CLASS_NAMES)).to(device)
+    model = FakeDetectorCNN(
+        len(CLASS_NAMES),
+        add_fft=add_fft,
+        add_lbp=add_lbp,
+        add_magnitude=add_magnitude,
+    ).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
     crit = nn.CrossEntropyLoss()
     loader = torch.utils.data.DataLoader(
@@ -211,8 +317,16 @@ def model_state_bytes(model: nn.Module) -> bytes:
 def load_model_from_bytes(
     state_bytes: bytes,
     map_location: str | torch.device = "cpu",
+    add_fft: bool = False,
+    add_lbp: bool = False,
+    add_magnitude: bool = False,
 ) -> FakeDetectorCNN:
-    model = FakeDetectorCNN(len(CLASS_NAMES))
+    model = FakeDetectorCNN(
+        len(CLASS_NAMES),
+        add_fft=add_fft,
+        add_lbp=add_lbp,
+        add_magnitude=add_magnitude,
+    )
     buf = io.BytesIO(state_bytes)
     model.load_state_dict(torch.load(buf, map_location=map_location, weights_only=True))
     model.eval()

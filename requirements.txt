@@ -1,19 +1,12 @@
 # ---- Production dependencies ----
 streamlit>=1.55.0
-pandas>=2.3.0
 numpy>=2.4.0
-scikit-learn>=1.8.0
-shap>=0.51.0
-lime>=0.2.0.1
-eli5>=0.16.0
 matplotlib>=3.10.0
 ollama>=0.6.0
-dice-ml>=0.11
 kagglehub>=1.0.0
 python-dotenv>=1.0.0
 Pillow>=10.0.0
-streamlit-drawable-canvas>=0.9.3
-# TTS: uses browser-native Web Speech API (zero server deps — no pip package needed)
-# PyTorch + torchvision: installed together from the CPU index in docker/Dockerfile.
-#   For local runs:
-#     pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+opencv-python-headless>=4.10.0
+scikit-image>=0.24.0
+torch>=2.0.0
+torchvision>=0.15.0

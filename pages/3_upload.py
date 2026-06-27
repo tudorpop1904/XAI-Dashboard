@@ -26,7 +26,14 @@ if uploaded:
 
     img_size = st.session_state["detector_img_size"]
     device = st.session_state["detector_device"]
-    model = load_model_from_bytes(st.session_state["detector_model_state"], device)
+    features = st.session_state.get("detector_features", {})
+    model = load_model_from_bytes(
+        st.session_state["detector_model_state"],
+        device,
+        add_fft=features.get("add_fft", True),
+        add_lbp=features.get("add_lbp", True),
+        add_magnitude=features.get("add_magnitude", True),
+    )
     x = pil_to_tensor(img, img_size)
     st.session_state["input_tensor"] = x
 

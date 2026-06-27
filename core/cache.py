@@ -1,5 +1,5 @@
 """
-cache.py — Response caching for LLM/VLM inference calls.
+cache.py — Response caching for LLM inference calls.
 
 Caches Ollama responses keyed by a SHA-256 hash of the request
 (model + messages). Dramatically speeds up repeated queries
@@ -15,10 +15,11 @@ import hashlib
 import json
 import pathlib
 import pickle
-from typing import Any, Dict, Optional
+from typing import Any
 
 CACHE_DIR = pathlib.Path("data_cache/llm_responses")
 MODEL_DIR = pathlib.Path("data_cache/models")
+
 
 # Create a hash of the request (model + messages + extra)
 def _make_key(model: str, messages: list, **extra) -> str:
@@ -30,8 +31,9 @@ def _make_key(model: str, messages: list, **extra) -> str:
     )
     return hashlib.sha256(payload.encode()).hexdigest()
 
+
 # Get cached response
-def get_cached(model: str, messages: list, **extra) -> Optional[Dict[str, Any]]:
+def get_cached(model: str, messages: list, **extra) -> dict[str, Any] | None:
     """Return cached response dict, or None if not cached."""
     key = _make_key(model, messages, **extra)
     path = CACHE_DIR / f"{key}.json"
@@ -42,8 +44,9 @@ def get_cached(model: str, messages: list, **extra) -> Optional[Dict[str, Any]]:
             return None
     return None
 
+
 # Store a response in the cache
-def put_cached(model: str, messages: list, response: Dict[str, Any], **extra) -> None:
+def put_cached(model: str, messages: list, response: dict[str, Any], **extra) -> None:
     """Store a response in the cache."""
     key = _make_key(model, messages, **extra)
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -53,8 +56,9 @@ def put_cached(model: str, messages: list, response: Dict[str, Any], **extra) ->
     except OSError:
         pass  # Non-critical — silently skip if write fails
 
+
 # Wrapper around client.chat() with transparent file-based caching
-def cached_chat(client, model: str, messages: list, **kwargs) -> Dict[str, Any]:
+def cached_chat(client, model: str, messages: list, **kwargs) -> dict[str, Any]:
     """
     Wrapper around client.chat() with transparent file-based caching.
 
@@ -70,6 +74,7 @@ def cached_chat(client, model: str, messages: list, **kwargs) -> Dict[str, Any]:
     put_cached(model, messages, response)
     return response
 
+
 # Delete all cached responses
 def clear_cache() -> int:
     """Delete all cached responses. Returns count of files removed."""
@@ -80,6 +85,7 @@ def clear_cache() -> int:
         f.unlink(missing_ok=True)
     return len(files)
 
+
 # Cache Trained Model
 def save_trained_model(model, name: str) -> None:
     """Serialize and save the trained model to a pickle file."""
@@ -88,6 +94,7 @@ def save_trained_model(model, name: str) -> None:
     with open(path, "wb") as f:
         pickle.dump(model, f)
 
+
 # Load Cached Model
 def load_trained_model(name: str):
     """Load a trained model from a pickle file."""
@@ -95,3 +102,16 @@ def load_trained_model(name: str):
     if path.exists():
         with open(path, "rb") as f:
             return pickle.load(f)
+
+def save_model_cache(name: str, state_bytes: bytes) -> None:
+    """Persist model state_dict bytes to disk."""
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    (MODEL_DIR / f"{name}.pt").write_bytes(state_bytes)
+
+
+def load_model_cache(name: str) -> bytes | None:
+    """Load cached model state_dict bytes, or None."""
+    path = MODEL_DIR / f"{name}.pt"
+    if path.exists():
+        return path.read_bytes()
+    return None

@@ -57,7 +57,14 @@ st.caption(f"Estimated forward passes (black-box): ~{total_bb_passes + len(use_b
 
 if st.button("Run XAI comparison", type="primary"):
     device = st.session_state["detector_device"]
-    model = load_model_from_bytes(st.session_state["detector_model_state"], device)
+    features = st.session_state.get("detector_features", {})
+    model = load_model_from_bytes(
+        st.session_state["detector_model_state"],
+        device,
+        add_fft=features.get("add_fft", True),
+        add_lbp=features.get("add_lbp", True),
+        add_magnitude=features.get("add_magnitude", True),
+    )
     x = st.session_state["input_tensor"]
     target = det.class_index
     img = st.session_state["uploaded_image"]
@@ -137,6 +144,24 @@ if st.session_state.get("xai_results"):
     for name, res in results.items():
         with st.expander(f"{name} ({res.category})", expanded=True):
             show_xai_result(res, img)
+
+    st.subheader("Forensic feature visualization")
+    features = st.session_state.get("detector_features", {})
+    from core.image_features import fft_channel, lbp_channel, magnitude_channel
+    x_tensor = st.session_state["input_tensor"]
+    fc1, fc2, fc3 = st.columns(3)
+    if features.get("add_fft", True):
+        with fc1:
+            st.write("**FFT Magnitude**")
+            st.image(fft_channel(x_tensor[0]).squeeze(0).cpu().numpy(), use_container_width=True, clamp=True)
+    if features.get("add_lbp", True):
+        with fc2:
+            st.write("**LBP Texture**")
+            st.image(lbp_channel(x_tensor[0]).squeeze(0).cpu().numpy(), use_container_width=True, clamp=True)
+    if features.get("add_magnitude", True):
+        with fc3:
+            st.write("**Gradient Magnitude**")
+            st.image(magnitude_channel(x_tensor[0]).squeeze(0).cpu().numpy(), use_container_width=True, clamp=True)
 
     if st.button("Generate report →", type="primary"):
         st.switch_page("pages/5_report.py")
