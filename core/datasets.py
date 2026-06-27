@@ -42,7 +42,7 @@ def _find_images(base_dir: Path, labels_map: dict[str, int]) -> list[tuple[Path,
     images = []
     for ext in ("*.jpg", "*.jpeg", "*.png", "*.webp"):
         for p in base_dir.rglob(ext):
-            path_str = str(p).lower()
+            path_str = str(p.relative_to(base_dir)).lower()
             # Determine label based on keywords in path
             label = -1
             if "real" in path_str or "true" in path_str or "original" in path_str:
