@@ -40,7 +40,7 @@ COPY pages/ pages/
 COPY ui/ ui/
 
 RUN mkdir -p /root/.streamlit && \
-    printf '[server]\nheadless = true\nport = 8501\naddress = "0.0.0.0"\n\n[browser]\ngatherUsageStats = false\n' \
+    printf '[server]\nheadless = true\nport = 8501\naddress = "0.0.0.0"\nenableCORS = false\nenableXsrfProtection = false\n\n[browser]\ngatherUsageStats = false\n' \
     > /root/.streamlit/config.toml
 
 EXPOSE 8501
