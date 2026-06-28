@@ -60,8 +60,15 @@ By default, Azure blocks all external ports except SSH (22). You must allow port
 
 ## Step 2: Provision the VM
 
-Run the setup script from your **local machine** using PowerShell or bash:
+You can provision the VM automatically from your **local machine** using either PowerShell (recommended on Windows) or Bash:
 
+### Option A: Using PowerShell (Windows)
+```powershell
+# Run the setup script
+Get-Content -Raw deploy/setup-cloud.sh | ssh -i <path-to-xai-key.pem> azureuser@<vm-public-ip> 'bash -s'
+```
+
+### Option B: Using Bash (Linux/macOS)
 ```bash
 ssh -i <path-to-xai-key.pem> azureuser@<vm-public-ip> 'bash -s' < deploy/setup-cloud.sh
 ```
@@ -70,23 +77,44 @@ This updates Ubuntu package databases, installs Docker + Docker Compose, configu
 
 ---
 
-## Step 3: First Deploy (Manual)
+## Step 3: Deployment & Auto-Open
 
-SSH into your Azure VM and start the dockerized dashboard:
+### Option A: Automated Launch with PowerShell (Windows)
+We provide an automation script that updates the VM codebase, runs Docker Compose, polls the port, and automatically opens the Azure application page in an **incognito browser**:
 
-```bash
-ssh -i <path-to-xai-key.pem> azureuser@<vm-public-ip>
-cd ~/xai-app
+```powershell
+# Standard deployment
+.\deploy\deploy-cloud.ps1 -vmIp "<vm-public-ip>" -sshKeyPath "<path-to-xai-key.pem>"
 
-# Fill in Kaggle credentials if you want to download datasets dynamically
-nano .env
-
-# Build and start (first time takes ~10-15 minutes to pull base images and models)
-docker compose -f docker/docker-compose.cloud.yml up -d --build --remove-orphans
-
-# Watch container initialization logs
-docker compose -f docker/docker-compose.cloud.yml logs -f
+# Deployment with complete reset/purge of obsolete files/containers
+.\deploy\deploy-cloud.ps1 -vmIp "<vm-public-ip>" -sshKeyPath "<path-to-xai-key.pem>" -reset
 ```
+
+### Option B: Manual SSH Deployment
+If you prefer doing it manually:
+
+1. SSH into your Azure VM:
+   ```bash
+   ssh -i <path-to-xai-key.pem> azureuser@<vm-public-ip>
+   ```
+2. Navigate to the project directory and pull the latest changes:
+   ```bash
+   cd ~/xai-app
+   git checkout v0.3/ai-imagery-detector
+   git pull
+   ```
+3. (Optional) Create/configure your `.env` file to add Kaggle credentials:
+   ```bash
+   nano .env
+   ```
+4. Build and start the dockerized dashboard:
+   ```bash
+   docker compose -f docker/docker-compose.cloud.yml up -d --build --remove-orphans
+   ```
+5. Watch initialization logs:
+   ```bash
+   docker compose -f docker/docker-compose.cloud.yml logs -f
+   ```
 
 Once the logs show `All models pulled. Ollama is ready!`, the app is live at:
 ```
@@ -121,8 +149,8 @@ Use this table to benchmark local CPU/GPU vs. Cloud CPU (Azure Standard_B4s_v2) 
 | Metric | Local (GPU/CPU) | Cloud (Azure B4s_v2 CPU) |
 |---|---|---|
 | LLM tokens/sec (llama3.1-8B-Q4) | ___ | ___ |
-| VLM transcription time (qwen2.5vl) | ___ s | ___ s |
-| CNN training time (EMNIST, 5 epochs) | ___ s | ___ s |
+| XAI Heatmap Generation time (Occlusion/Grad-CAM) | ___ s | ___ s |
+| CNN training time (CIFAKE/Synthetic, 5 epochs) | ___ s | ___ s |
 | App cold start (docker compose up) | ___ s | ___ s |
 | Streamlit page load (first paint) | ___ ms | ___ ms |
 

@@ -55,9 +55,9 @@ else
     echo "  $(green '✓') Repository already exists at $REPO_DIR"
 fi
 cd "$REPO_DIR"
-git checkout v0.2/logistics-and-metrics
+git checkout v0.3/ai-imagery-detector
 git pull
-echo "  $(green '✓') Switched to branch v0.2/logistics-and-metrics and pulled latest changes"
+echo "  $(green '✓') Switched to branch v0.3/ai-imagery-detector and pulled latest changes"
 
 # Create .env if not present
 if [ ! -f "$REPO_DIR/.env" ]; then

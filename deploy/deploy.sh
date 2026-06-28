@@ -27,7 +27,7 @@ echo "=== Deploying to Microsoft Azure VM: ${VM_IP} ==="
 # 1. Pull latest code
 echo "[1/3] Pulling latest code..."
 ssh ${SSH_OPTS} "${SSH_USER}@${VM_IP}" \
-    "cd ${REPO_DIR} && git fetch --all && git reset --hard origin/main"
+    "cd ${REPO_DIR} && git fetch --all && git reset --hard origin/v0.3/ai-imagery-detector"
 
 # 2. Rebuild and restart
 echo "[2/3] Building and restarting containers..."

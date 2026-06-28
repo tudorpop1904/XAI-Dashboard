@@ -1,102 +1,102 @@
-# Career Navigator AI 🎓
+# 🔍 AI Imagery Forensic & Deepfake Detector (XAI Dashboard) 🛡️
 
-A multi-page Streamlit application demonstrating **Explainable AI** for career guidance. Students can explore how machine-learning models make career predictions and understand the reasoning behind them using SHAP, LIME, and LLM-powered interpretations.
+An Explainable AI (XAI) dashboard for image forensics using the **Faster-Than-Lies (FTL)** methodology. It detects AI-generated (fake) images vs. real camera images by combining traditional RGB representations with forensic feature engineering (FFT Magnitude, LBP Textures, and Sobel Gradients). It compares multiple white-box and black-box visual explanation techniques (Grad-CAM, Saliency, Occlusion, PMI) and leverages a local Large Language Model (LLM) to write forensic analysis reports.
 
-## 🌟 Features
+---
 
-- **Multi-page Wizard**: Step-by-step flow — Dataset → Train → Predict → Explain → Interpret.
-- **Multiple ML Models**: Random Forest, Gradient Boosting, Decision Tree, Logistic Regression, SVM.
-- **XAI Method Selection**: Choose between SHAP and LIME (or both), with configurable run counts.
-- **Dynamic Datasets**: Pull career-guidance datasets directly from Kaggle.
-- **LLM Interpretation**: "Why did the AI predict that?" — explained in plain English via Ollama.
+## 🌟 Key Features
+
+- **Multi-Page Wizard Workflow**:
+  - 🏠 **Home**: Explore forensic principles (FFT, LBP, and Sobel Gradients).
+  - ⚙️ **Setup**: Configure model settings, toggling FFT/LBP/Sobel forensic channels, and train a CNN model (on synthetic/Kaggle datasets like CIFAKE).
+  - 📤 **Upload**: Upload custom images or select from testing sets to analyze.
+  - ⚖️ **XAI Comparison**: Compare heatmaps side-by-side using Grad-CAM, Saliency, Occlusion, and PMI.
+  - 📋 **Report**: Generate narrative forensic analysis reports using local LLMs.
+- **Forensic Feature Engineering**:
+  - **FFT Channel**: Captures periodic frequency anomalies typical of generative models.
+  - **LBP Channel**: Detects Local Binary Pattern texture artifacts.
+  - **Sobel Channel**: Highlighting edge and gradient magnitude patterns.
+- **Dual Explainer Baselines**:
+  - **White-box**: Grad-CAM, Input Saliency.
+  - **Black-box**: Occlusion, PMI (Pointwise Mutual Information).
+- **Narrative Reporting**: Automated Romanian/English bilingual reporting powered by local Ollama instances running `llama3.1:8b-instruct-q4_K_M`.
+
+---
 
 ## 📂 Project Structure
 
 ```
 xai-app/
-├── app.py                      # Entrypoint — st.navigation router
-├── pages/                      # Multi-page Streamlit pages
-│   ├── 1_home.py               #   XAI category selection
-│   ├── 2_dataset.py            #   Dataset download & preview
-│   ├── 3_train.py              #   Model selection & training
-│   ├── 4_predict.py            #   Custom data input & prediction
-│   ├── 5_explain.py            #   SHAP/LIME configuration & execution
-│   ├── 6_interpret.py          #   LLM-powered explanation
-│   ├── viz_1_data.py           #   Basic data visualization & analysis
-│   ├── viz_2_train.py          #   Basic model training visualization
-│   ├── viz_3_predict.py        #   Basic prediction visualization
-│   ├── viz_4_explain.py        #   Basic explanation visualization
-│   ├── viz_5_counselor.py      #   Counselor career guidance questions
-│   ├── viz_adv_1_analyze.py    #   Advanced visual analytics with Altair
-│   ├── viz_adv_2_transcribe.py #   VLM handwritten math review
-│   ├── viz_adv_3_explain.py    #   Explain handwritten math with LLM
-│   ├── viz_adv_4_review.py     #   Review math solution with LLM
-│   ├── viz_adv_5_quiz.py       #   AI quiz master for math problems
-│   └── viz_adv_6_interview.py  #   AI interview simulator for careers
-├── core/                   # ML models, XAI engines, LLM integration
-│   ├── models.py           #   Multi-model registry & training
-│   ├── shap_engine.py      #   SHAP with auto-explainer routing
-│   ├── lime_engine.py      #   LIME tabular explainer
-│   ├── llm.py              #   Ollama LLM client
-│   ├── vlm_engine.py       #   Qwen2.5-VL VLM client for math review
-│   └── preprocessing.py    #   Data encoding & task detection
-├── data/                   # Dataset handling
-│   ├── datasets.py         #   Kaggle dataset registry
-│   ├── loader.py           #   Download & CSV loading
-│   └── cleaner.py          #   Cleaning & imputation
-├── ui/                     # Streamlit UI components
-│   ├── state.py            #   Centralised session state
-│   ├── forms.py            #   Dynamic input forms
-│   ├── plots.py            #   SHAP/LIME bar charts
-│   └── schema.py           #   Schema inference
-├── docker/                 # Docker configuration
-│   ├── Dockerfile
-│   ├── docker-compose.yml
-│   └── .dockerignore
-└── requirements.txt
+├── app.py                      # Main entrypoint — Streamlit navigation router
+├── pages/                      # Multi-page Streamlit views
+│   ├── 1_home.py               #   Overview of forensics & XAI categories
+│   ├── 2_setup.py              #   Model settings & training configuration
+│   ├── 3_upload.py             #   Image upload & prediction view
+│   ├── 4_xai_compare.py        #   Heatmap generation (Grad-CAM, Occlusion, etc.)
+│   └── 5_report.py             #   LLM narrative generation
+├── core/                       # Core ML, XAI, and LLM implementations
+│   ├── fake_data.py            #   Synthetic data generator
+│   ├── datasets.py             #   Kaggle dataset integration (CIFAKE)
+│   ├── fake_detector.py        #   CNN model, Grad-CAM, Saliency baselines
+│   ├── image_features.py       #   LBP, FFT, and Sobel feature extractors
+│   ├── image_xai.py            #   Black-box explainer algorithms
+│   ├── xai_metrics.py          #   Fidelity & stability evaluation
+│   ├── cache.py                #   Model & training state management
+│   └── llm.py                  #   Ollama client integration
+├── deploy/                     # VM Deployment & automation scripts
+│   ├── setup-cloud.sh          #   Azure Ubuntu initialization script
+│   ├── deploy.sh               #   Jenkins deployment wrapper script
+│   ├── deploy-local.ps1        #   Local PowerShell launch and verify automation
+│   └── deploy-cloud.ps1        #   Azure PowerShell update/reset automation
+├── docker/                     # Container files
+│   ├── Dockerfile.app          #   Streamlit application image
+│   ├── Dockerfile.ollama       #   Ollama server image
+│   ├── Dockerfile.jenkins      #   CI/CD automation image
+│   ├── docker-compose.yml      #   Local orchestration file
+│   └── docker-compose.cloud.yml#   Azure VM orchestration file
+└── requirements.txt            # Python dependencies
 ```
+
+---
 
 ## ⚡ Setup & Run
 
 ### Prerequisites
 - Python 3.12+ (if running locally)
-- Docker & Docker Compose (if using containers)
-- Kaggle API Credentials (in `.env`)
+- Docker & Docker Compose (recommended)
+- Kaggle API Credentials (in `.env` file, only if loading external datasets like CIFAKE)
 
-### Running Locally
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-### Running with Docker (Recommended)
-1. **Configure credentials**: Create `.env` with your Kaggle username and key.
-2. **Launch containers**:
+### Option A: Local Execution (Without Docker)
+1. Install dependencies:
    ```bash
-   docker-compose -f docker/docker-compose.yml up -d --build
+   pip install -r requirements.txt
    ```
-3. **Pull the LLM model** (first time only):
+2. Start the dashboard:
    ```bash
-   docker exec -it xai-ollama ollama pull llama3.1:8b-instruct-q4_K_M
+   streamlit run app.py
    ```
-4. **Pull the VLM model** (first time only):
+
+### Option B: Containerized Execution (Recommended)
+1. **Configure Environment**: Create a `.env` file in the root directory:
+   ```env
+   KAGGLE_USERNAME=your_username
+   KAGGLE_API_TOKEN=your_token
+   ```
+2. **Launch with PowerShell Automator**:
+   ```powershell
+   .\deploy\deploy-local.ps1
+   ```
+   *This automatically starts the docker stack, polls Streamlit until it's ready, and launches it in an Incognito/InPrivate browser window.*
+
+3. **Manual Startup**:
    ```bash
-   docker exec -it xai-ollama ollama pull qwen2.5vl:7b-q4_K_M
+   docker compose -f docker/docker-compose.yml up -d --build
    ```
-5. **Pull the VLM Surrogate model** (first time only):
-   ```bash
-   docker exec -it xai-ollama ollama pull minicpm-v
-   ```
-6. **Access the app**: Go to `http://localhost:8501`.
+   Once started, the dashboard is available at: [http://localhost:8501](http://localhost:8501).
 
-## 🛠️ Memory Optimization
+---
 
-| Model | RAM needed |
-|-------|-----------|
-| `llama3.1:8b-instruct-q4_K_M` | ~6.5 GB |
-| `qwen2.5vl:7b-q4_K_M` | ~10 GB |
-| `minicpm-v` | ~4 GB |
+## ☁️ Azure Cloud Deployment
 
-
-
-See [DOCKER_GUIDE.md](./DOCKER_GUIDE.md) for WSL2 tuning, GPU setup, and cloud deployment tips.
+For VM deployment guidelines, resource bounds, and credentials setup in Jenkins, refer to:
+👉 [CLOUD_DEPLOY.md](./CLOUD_DEPLOY.md)
