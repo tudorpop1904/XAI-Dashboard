@@ -1,6 +1,6 @@
 # ---- Production dependencies ----
 streamlit>=1.55.0
-numpy>=2.4.0
+numpy
 matplotlib>=3.10.0
 ollama>=0.6.0
 kagglehub>=1.0.0
