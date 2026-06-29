@@ -4,7 +4,7 @@ WORKDIR /build
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        build-essential && \
+    build-essential && \
     rm -rf /var/lib/apt/lists/*
 
 RUN python -m venv /opt/venv
@@ -15,11 +15,9 @@ COPY requirements.txt .
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip && \
     pip install \
-        torch torchvision \
-        --index-url https://download.pytorch.org/whl/cpu && \
-    python -c "import numpy; print(f'numpy=={numpy.__version__}')" > /tmp/numpy-constraint.txt && \
-    pip install -r requirements.txt -c /tmp/numpy-constraint.txt && \
-    python -c "import numpy, torch; print(f'OK: numpy={numpy.__version__}, torch={torch.__version__}')"
+    torch torchvision \
+    --index-url https://download.pytorch.org/whl/cpu && \
+    pip install -r requirements.txt
 
 FROM python:3.12-slim AS runtime
 
@@ -27,8 +25,8 @@ WORKDIR /app
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        libgomp1 \
-        fonts-dejavu-core && \
+    libgomp1 \
+    fonts-dejavu-core && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /opt/venv /opt/venv
@@ -38,11 +36,12 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY app.py .
 
 COPY core/ core/
+COPY data/ data/
 COPY pages/ pages/
 COPY ui/ ui/
 
 RUN mkdir -p /root/.streamlit && \
-    printf '[server]\nheadless = true\nport = 8501\naddress = "0.0.0.0"\nenableCORS = false\nenableXsrfProtection = false\n\n[browser]\ngatherUsageStats = false\n' \
+    printf '[server]\nheadless = true\nport = 8501\naddress = "0.0.0.0"\n\n[browser]\ngatherUsageStats = false\n' \
     > /root/.streamlit/config.toml
 
 EXPOSE 8501

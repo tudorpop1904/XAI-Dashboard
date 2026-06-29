@@ -42,13 +42,14 @@ def _find_images(base_dir: Path, labels_map: dict[str, int]) -> list[tuple[Path,
     images = []
     for ext in ("*.jpg", "*.jpeg", "*.png", "*.webp"):
         for p in base_dir.rglob(ext):
-            path_str = str(p.relative_to(base_dir)).lower()
-            # Determine label based on keywords in path
+            parts = [part.lower() for part in p.relative_to(base_dir).parts]
             label = -1
-            if "real" in path_str or "true" in path_str or "original" in path_str:
-                label = LABEL_REAL
-            elif "fake" in path_str or "ai" in path_str or "generated" in path_str:
-                label = LABEL_AI
+            # Iterate through the path parts so the deepest matching folder dictates the label
+            for part in parts:
+                if "real" in part or "true" in part or "original" in part:
+                    label = LABEL_REAL
+                elif "fake" in part or "ai" in part or "generated" in part:
+                    label = LABEL_AI
 
             if label != -1:
                 images.append((p, label))
