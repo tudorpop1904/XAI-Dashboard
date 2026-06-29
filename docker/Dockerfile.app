@@ -17,7 +17,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
         torch torchvision \
         --index-url https://download.pytorch.org/whl/cpu && \
-    pip install -r requirements.txt
+    python -c "import numpy; print(f'numpy=={numpy.__version__}')" > /tmp/numpy-constraint.txt && \
+    pip install -r requirements.txt -c /tmp/numpy-constraint.txt && \
+    python -c "import numpy, torch; print(f'OK: numpy={numpy.__version__}, torch={torch.__version__}')"
 
 FROM python:3.12-slim AS runtime
 
